@@ -3,4 +3,7 @@
 ## 개발 환경
 - IntelliJ
 - JAVA 17
-- 
+
+## 테스팅 환경
+- JUnit
+- Raspberrypi

@@ -6,4 +6,5 @@
 
 ## 테스팅 환경
 - JUnit
+- On Premise
 - Raspberry Pi

@@ -15,4 +15,27 @@ class MainTest {
         Main main = new Main();
         assertEquals(main.sum(1, 2), 4);
     }
+
+    @Test
+    void viewItemCorrect() {
+        Main main = new Main();
+    }
+
+    @Test
+    void viewItemNotCorrect() {
+
+    }
+
+    @Test
+    void selectItemOfferUser() {}
+
+    @Test
+    void selectItemOtherDVM() {
+
+    }
+
+    @Test
+    void selectItemNotOffer() {}
+
+
 }

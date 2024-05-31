@@ -74,7 +74,7 @@ class MainTest {
     }
 
     @Test
-    void reqStockMsgNotCorrrect() {
+    void reqStockMsgNotCorrect() {
 
     }
 
@@ -160,12 +160,12 @@ class MainTest {
     }
 
     @Test
-    void canclePayCorrectCardNum() {
+    void cancelPayCorrectCardNum() {
 
     }
 
     @Test
-    void canclePayNotCorrectCardNum() {
+    void cancelPayNotCorrectCardNum() {
 
     }
 }

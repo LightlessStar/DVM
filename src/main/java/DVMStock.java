@@ -5,7 +5,7 @@ public class DVMStock {
     DVMController dvmController;
     public DVMStock() {
         item = new int[20];
-        Controller= new DVMController();
+        dvmController= new DVMController();
         Is_our_item=new boolean[20];
         for(int i=0;i<item.length;i++){
             if(i<=7){
@@ -20,7 +20,7 @@ public class DVMStock {
 
     public int check_stock(int item_code, int count){
         if(item[item_code-1]==-1 || item[item_code-1]==0){
-            if(Controller.request_stock_msg(item_code, count)){
+            if(dvmController.request_stock_msg(item_code, count)){
                 return 1;
             }else{
                 return 2;

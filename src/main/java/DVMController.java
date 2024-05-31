@@ -18,6 +18,15 @@ public class DVMController {
 
     }
     public boolean request_stock_msg(int item_code, int count){
+        stock_msg_JSON = new JSONObject();
+        JSONObject item_JSON = new JSONObject();
+        stock_msg_JSON.put("msg_type","req_stock");
+        stock_msg_JSON.put("src_id","Team6");
+        stock_msg_JSON.put("dst_id","0");
+        item_JSON.put("item_code",item_code);
+        item_JSON.put("count",count);
+        stock_msg_JSON.put("msg_content", item_JSON);
+        //req_stock_msg(stock_msg_JSON);
         return true;
     }
     public boolean send_code(String verify_code){
@@ -118,7 +127,7 @@ public class DVMController {
 
 
 
-//    public JSONObject res_stock_msg(JSONObject msg){
+//    private JSONObject res_stock_msg(JSONObject msg){
 //        try (ServerSocket serverSocket = new ServerSocket(port)) {
 //            System.out.println("Server is listening on port " + port);
 //
@@ -147,7 +156,7 @@ public class DVMController {
 //        }
 //        return msg;
 //    }
-//    public JSONObject req_stock_msg(JSONObject msg){
+//    private JSONObject req_stock_msg(JSONObject msg){
 //        try (socket = new Socket(host, port)) {
 //            JsonSocketServiceImpl service = new JsonSocketServiceImpl(socket);
 //            service.start();

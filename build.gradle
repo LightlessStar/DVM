@@ -11,13 +11,26 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+    }
+
+    test {
+        java {
+            srcDir 'test'
+        }
+    }
+}
 dependencies {
     testImplementation 'junit:junit:4.12'
 }
 
-application {
-    mainClassName = "Main.java"
-}
+//application {
+//    mainClassName = "Main"
+//}
 
 jar {
     manifest {

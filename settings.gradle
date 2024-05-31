@@ -9,16 +9,4 @@ rootProject.name = 'DVM'
 
 include 'src'
 
-sourceSets {
-    main {
-        java {
-            srcDir 'src'
-        }
-    }
 
-    test {
-        java {
-            srcDir 'test'
-        }
-    }
-}

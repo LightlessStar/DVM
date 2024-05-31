@@ -1,7 +1,4 @@
 public class DVMUI {
-    /**
-     * status : 0 - default action, 1 - pay, 2 - prepay, -1 : error
-     */
     private int status;
     private DVMStock dvmStock;
     private DVMController dvmController;
@@ -56,7 +53,7 @@ public class DVMUI {
      * @param count : Drink Amount, 1 ~ 20, or Error Occur
      */
     public void select_item(int item_code, int count) {
-        boolean ret;
+        int ret;
 
         if (count < 1 || count > 20)
         {
@@ -64,8 +61,15 @@ public class DVMUI {
         }
         else
         {
+            //TODO : return type setting
+            /**
+             * return -1 : error
+             * return 1 :
+             * return 2 :
+             * return 3 : count > 20, count < 0
+             */
             ret = dvmStock.check_stock(item_code, count);
-            if (!ret)
+            if (ret == 0)
             {
                 prepay_UI(status);
             }
@@ -133,7 +137,21 @@ public class DVMUI {
         //TODO : add_item status shift logic
     }
 
+    /**
+     * Add item in Administer mode
+     * @param item_code : add item code
+     * @param stock : add item amount
+     * if add_item_admin is true : show add
+     * else : show fail add
+     */
     public void add_item(int item_code, int stock) {
-
+        if (dvmStock.add_item_admin(item_code, stock))
+        {
+            check_stock_UI(this.status);
+        }
+        else
+        {
+            check_stock_UI(this.status);
+        }
     }
 }

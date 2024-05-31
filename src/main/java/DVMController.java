@@ -7,7 +7,7 @@ public class DVMController {
     private String verify_code;
     private JSONObject stock_msg_JSON;
     private JSONObject prepayment_msg_JSON;
-    private final int[] coord_xy= {27, 80}; //주어진 우리 DVM 좌표
+    private final int[] coord_xy; //주어진 우리 DVM 좌표
     private HashMap<String, int[]> other_dvm_coord;
     private HashMap<String, JSONObject> other_dvm_stock;
     private Socket socket;
@@ -15,10 +15,13 @@ public class DVMController {
     private OutputStream out;
 
     public DVMController() {
-
+        stock_msg_JSON = new JSONObject();
+        coord_xy = new int[] {27,80};
+        other_dvm_coord = new HashMap<String, int[]>();
+        other_dvm_stock = new HashMap<String, JSONObject>();
+        socket = null;
     }
     public boolean request_stock_msg(int item_code, int count){
-        stock_msg_JSON = new JSONObject();
         JSONObject item_JSON = new JSONObject();
         stock_msg_JSON.put("msg_type","req_stock");
         stock_msg_JSON.put("src_id","Team6");
@@ -26,6 +29,9 @@ public class DVMController {
         item_JSON.put("item_code",item_code);
         item_JSON.put("count",count);
         stock_msg_JSON.put("msg_content", item_JSON);
+        JSONObject temp = new JSONObject();
+        temp = stock_msg_JSON.getJSONObject("msg_content");
+        System.out.println(temp.get("item_code"));
         //req_stock_msg(stock_msg_JSON);
         return true;
     }
@@ -156,20 +162,27 @@ public class DVMController {
 //        }
 //        return msg;
 //    }
-//    private JSONObject req_stock_msg(JSONObject msg){
-//        try (socket = new Socket(host, port)) {
-//            JsonSocketServiceImpl service = new JsonSocketServiceImpl(socket);
-//            service.start();
-//
-//            // 서버로 메시지를 보내고 응답을 받습니다.
-//            service.sendMessage(new Message("Hello, server!"));
-//            Message response = service.receiveMessage(Message.class);
-//
-//            service.stop();
-//        } catch (Exception e) {
-//            System.out.println("Client exception: " + e.getMessage());
-//            e.printStackTrace();
-//        }
-//        return msg;
-//    }
+    private JSONObject req_stock_msg(JSONObject msg){
+        try (socket = new Socket(host, port)) {
+            JsonSocketServiceImpl service = new JsonSocketServiceImpl(socket);
+            service.start();
+
+            // 서버로 메시지를 보내고 응답을 받습니다.
+            service.sendMessage(msg);
+            Message response = service.receiveMessage(Message.class);
+            JSONObject msg_content = new JSONObject();
+            msg_content = response.getJSONObject("msg_content");
+            other_dvm_stock.put(response.get("src_id"),msg_content);
+            int[] coor = new int[2];
+            coor[0] =  msg_content.getInt("coor_x");
+            coor[1] = msg_content.getInt("coor_y");
+            other_dvm_coord.put(response.get("src_id"), coor);
+
+            service.stop();
+        } catch (Exception e) {
+            System.out.println("Client exception: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return res;
+    }
 }

@@ -5,6 +5,7 @@ import org.json.JSONObject;
 
 public class DVMController {
     private String verify_code;
+    private int[] price; //결제 금액 저장용 변수
     private JSONObject stock_msg_JSON;
     private JSONObject prepayment_msg_JSON;
     private final int[] coord_xy; //주어진 우리 DVM 좌표
@@ -17,13 +18,18 @@ public class DVMController {
 
     public DVMController() {
         verify_code = "";
+        price = new int[20];
         stock_msg_JSON = new JSONObject();
         coord_xy = new int[] {27,80};
         other_dvm_coord = new HashMap<String, int[]>();
         other_dvm_stock = new HashMap<String, JSONObject>();
         bank = new Bank();
+        for(int i = 0; i<price.length; i++){
+            price[i] = 500;
+        }
     }
     public boolean request_stock_msg(int item_code, int count){
+
         JSONObject item_JSON = new JSONObject();
         stock_msg_JSON.put("msg_type","req_stock");
         stock_msg_JSON.put("src_id","Team6");
@@ -37,9 +43,13 @@ public class DVMController {
         return true;
     }
     public boolean send_code(String verify_code){
+
         return true;
     }
     public boolean send_card_num(int card_id){
+        if (bank.certify_pay(card_id)){
+
+        }
         return true;
     }
 

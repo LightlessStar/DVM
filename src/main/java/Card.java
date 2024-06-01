@@ -12,11 +12,14 @@ public class Card {
             return false;
         }
     }
-    public boolean cash_check(int Cash){
-        if(cash >= Cash){
+    public boolean cash_check(int charge){
+        if(cash >= charge){
             return true;
         }else{
             return false;
         }
+    }
+    public void pay(int charge){
+        cash -= charge;
     }
 }

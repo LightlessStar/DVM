@@ -12,14 +12,16 @@ public class Bank {
     public boolean certify_pay(int card_id, int charge){
         for(int i = 0; i < card.length; i++){
             if(card[i].card_check(card_id) && card[i].cash_check(charge)){
-                    return true;
+                card[i].pay(charge);
+                return true;
             }
         }
         return false;
     }
-    public boolean cancel_pay(int card_id){
+    public boolean cancel_pay(int card_id,int charge){
         for(int i = 0; i < card.length; i++){
             if(card[i].card_check(card_id)){
+                card[i].pay(-charge);
                 return true;
             }
         }

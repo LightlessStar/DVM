@@ -13,6 +13,7 @@ public class DVMController {
     private Socket socket;
     private InputStream in;
     private OutputStream out;
+    private Bank bank; //이거 왜 없어ㅓㅓㅓㅓㅓDCD에 넣어야 해
 
     public DVMController() {
         verify_code = "";
@@ -20,7 +21,7 @@ public class DVMController {
         coord_xy = new int[] {27,80};
         other_dvm_coord = new HashMap<String, int[]>();
         other_dvm_stock = new HashMap<String, JSONObject>();
-
+        bank = new Bank();
     }
     public boolean request_stock_msg(int item_code, int count){
         JSONObject item_JSON = new JSONObject();

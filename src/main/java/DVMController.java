@@ -5,6 +5,7 @@ import org.json.JSONObject;
 
 public class DVMController {
     private String verify_code;
+    private int[] price; //결제 금액 저장용 변수
     private JSONObject stock_msg_JSON;
     private JSONObject prepayment_msg_JSON;
     private final int[] coord_xy; //주어진 우리 DVM 좌표
@@ -13,15 +14,22 @@ public class DVMController {
     private Socket socket;
     private InputStream in;
     private OutputStream out;
+    private Bank bank; //이거 왜 없어ㅓㅓㅓㅓㅓDCD에 넣어야 해
 
     public DVMController() {
+        verify_code = "";
+        price = new int[20];
         stock_msg_JSON = new JSONObject();
         coord_xy = new int[] {27,80};
         other_dvm_coord = new HashMap<String, int[]>();
         other_dvm_stock = new HashMap<String, JSONObject>();
-        socket = null;
+        bank = new Bank();
+        for(int i = 0; i<price.length; i++){
+            price[i] = 500;
+        }
     }
     public boolean request_stock_msg(int item_code, int count){
+
         JSONObject item_JSON = new JSONObject();
         stock_msg_JSON.put("msg_type","req_stock");
         stock_msg_JSON.put("src_id","Team6");
@@ -31,14 +39,17 @@ public class DVMController {
         stock_msg_JSON.put("msg_content", item_JSON);
         JSONObject temp = new JSONObject();
         temp = stock_msg_JSON.getJSONObject("msg_content");
-        System.out.println(temp.get("item_code"));
-        //req_stock_msg(stock_msg_JSON);
+        req_stock_msg(stock_msg_JSON);
         return true;
     }
     public boolean send_code(String verify_code){
+
         return true;
     }
     public boolean send_card_num(int card_id){
+        if (bank.certify_pay(card_id)){
+
+        }
         return true;
     }
 
@@ -79,7 +90,6 @@ public class DVMController {
         });
         serverThread.start();
     }
-
 
     public void runClient() {
         Thread clientThread = new Thread(() -> {
@@ -131,39 +141,37 @@ public class DVMController {
         clientThread.start();
     }
 
+    private JSONObject res_stock_msg(JSONObject msg){
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
+            System.out.println("Server is listening on port " + port);
 
+            while (true) {
+                Socket clientSocket = serverSocket.accept();
+                try {
+                    this.writer = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream(), "UTF-8"), true);
+                    this.reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), "UTF-8"));
+                } catch (Exception e) {
+                    throw new RuntimeException("Error initializing streams", e);
+                }
+                // 여기서 클라이언트로부터 메시지를 받고, 응답을 보낼 수 있습니다.
+                service.sendMessage("Hello from server");
 
-//    private JSONObject res_stock_msg(JSONObject msg){
-//        try (ServerSocket serverSocket = new ServerSocket(port)) {
-//            System.out.println("Server is listening on port " + port);
-//
-//            while (true) {
-//                Socket clientSocket = serverSocket.accept();
-//                try {
-//                    this.writer = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream(), "UTF-8"), true);
-//                    this.reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), "UTF-8"));
-//                } catch (Exception e) {
-//                    throw new RuntimeException("Error initializing streams", e);
-//                }
-//                // 여기서 클라이언트로부터 메시지를 받고, 응답을 보낼 수 있습니다.
-//                service.sendMessage("Hello from server");
-//
-//                try {
-//                    writer.close();
-//                    reader.close();
-//                    clientSocket.close();
-//                } catch (Exception e) {
-//                    throw new RuntimeException("Error closing streams", e);
-//                }
-//            }
-//        } catch (Exception e) {
-//            System.out.println("Server exception: " + e.getMessage());
-//            e.printStackTrace();
-//        }
-//        return msg;
-//    }
+                try {
+                    writer.close();
+                    reader.close();
+                    clientSocket.close();
+                } catch (Exception e) {
+                    throw new RuntimeException("Error closing streams", e);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Server exception: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return msg;
+    }
     private JSONObject req_stock_msg(JSONObject msg){
-        try (socket = new Socket(host, port)) {
+        try (Socket socket = new Socket(host, port)) {
             JsonSocketServiceImpl service = new JsonSocketServiceImpl(socket);
             service.start();
 

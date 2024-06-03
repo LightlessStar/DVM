@@ -211,6 +211,39 @@ public class DVMUI extends JFrame {
 
   private void complete_prepay_UI(int status) {
     //TODO : implement
+    //TODO : use code_and_loc
+    String[] str;
+
+    str = dvmController.code_and_loc();
+    Container contentPane = getContentPane();
+    contentPane.setLayout(new GridLayout(1, 6));
+
+    JLabel title1 = new JLabel("선결제 완료");
+    JLabel body1 = new JLabel(str[0]);
+    JLabel body2 = new JLabel("가장 가까운 자판기에 가서 수령하세요.");
+    JLabel body3 = new JLabel(str[1]);
+    JLabel body4 = new JLabel(str[2]);
+    JButton button = new JButton("확인");
+    button.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        item_list_UI(DEF);
+      }
+    });
+    contentPane.add(title1);
+    contentPane.add(body1);
+    contentPane.add(body2);
+    contentPane.add(body3);
+    contentPane.add(body4);
+    contentPane.add(button);
+
+    //새로운 contentPane으로 설정
+    frame.setContentPane(contentPane);
+
+    //새 contentPane 재배치 및 다시 그리기
+    frame.revalidate();
+    ;
+    frame.repaint();
   }
 
   /**
@@ -226,6 +259,7 @@ public class DVMUI extends JFrame {
     JLabel adminLabel = new JLabel("재고 확인", JLabel.CENTER);
     contentPane.add(adminLabel, BorderLayout.NORTH);
 
+    //TODO : Implement in this line
 
   }
 
@@ -268,11 +302,11 @@ public class DVMUI extends JFrame {
     Container contentPane = frame.getContentPane();
     contentPane.setLayout(new BorderLayout());
     if (status == DEF) {
-      String[] chocies = new String[20];
+      String[] choices = new String[20];
       for (int i = 1; i <= 20; i++) {
         choices[i - 1] = drink[i];
       }
-      JComboBox<String> comboBox = new JComboBox<>(chocies);
+      JComboBox<String> comboBox = new JComboBox<>(choices);
       contentPane.add(comboBox);
 
       JTextField numberInput = new JTextField(10);
@@ -360,7 +394,7 @@ public class DVMUI extends JFrame {
    * 부족(둘다 동일함)
    *
    * @param card_id : card id in user input this->status -> PAY or PREPAY Check req b
-   *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      TODO : require in 1-e sequence diagram
+   *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                TODO : require in 1-e sequence diagram
    */
   public void insert_card(int card_id) {
     if (status == PAY) {

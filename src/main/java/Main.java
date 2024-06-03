@@ -7,15 +7,17 @@ public class Main {
 
 
         //DVM Controller main test
-        DVMController dvmController = new DVMController();
+        DVMController server_dvmController = new DVMController();
+        DVMController cli_dvmController = new DVMController();
+        DVMController cli2_dvmController = new DVMController();
 //        dvmController.runServer();
 //        dvmController.runClient();
 //        dvmController.runClient2();
-        dvmController.res_stock_msg();
-        dvmController.request_stock_msg(3, 4);
-//        dvmController.request_stock_msg(3, 5);
-//        dvmController.request_stock_msg(3, 6);
-//        dvmController.request_stock_msg(3, 7);
+        server_dvmController.res_stock_msg();
+        cli_dvmController.request_stock_msg(3, 4);
+//        cli2_dvmController.request_stock_msg(3, 5);
+//        cli_dvmController.request_stock_msg(3, 6);
+//        cli_dvmController.request_stock_msg(3, 7);
 
     }
 }

@@ -19,6 +19,7 @@ public class DVMUI extends JFrame {
   };
 
   private int status;
+  final private JFrame frame;
   private DVMStock dvmStock;
   private DVMController dvmController;
 
@@ -33,7 +34,8 @@ public class DVMUI extends JFrame {
 
 
   public DVMUI() {
-    JFrame frame = new JFrame("DVM TEAM6");
+    frame = new JFrame("DVM TEAM6");
+//    this->frame = frame;
     frame.setSize(600, 300);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     item_list_UI(DEF);
@@ -41,7 +43,7 @@ public class DVMUI extends JFrame {
   }
 
   private void item_list_UI(int status) {
-    Container contentPane = getContentPane();
+    Container contentPane = frame.getContentPane();
     //4 * 5 짜리 jpanel을 만들어 jframe에 부착하는 작업.
     JPanel buttonPanel1 = new JPanel();
     buttonPanel1.setLayout(new GridLayout(4, 5));
@@ -81,6 +83,14 @@ public class DVMUI extends JFrame {
     //패널 2개를 contentPane에 추가
     contentPane.add(buttonPanel1, BorderLayout.CENTER);
     contentPane.add(buttonPanel2, BorderLayout.SOUTH);
+
+    //새로운 contentPane으로 설정
+    frame.setContentPane(contentPane);
+
+    //새 contentPane 재배치 및 다시 그리기
+    frame.revalidate();
+    ;
+    frame.repaint();
   }
 
   /**
@@ -93,27 +103,122 @@ public class DVMUI extends JFrame {
     Container contentPane = getContentPane();
     String drinkSomething = drink[status];
 
+    String printTitle = "현재 재고가 부족합니다.";
+    String printSub = "선결제를 진행하고 구매할 수 있습니다.\n " + drinkSomething + "\n선결제를 진행하시겠습니까?\n";
+
+    JPanel top = new JPanel(new GridLayout(1, 3));
+    JLabel title = new JLabel(printTitle);
+    top.add(title, BorderLayout.NORTH);
+    JPanel subTitle = new JPanel();
+    top.add(subTitle, BorderLayout.CENTER);
+    JPanel bottom = new JPanel(new GridLayout(2, 1));
+    JButton button1 = new JButton("구매");
+    JButton button2 = new JButton("취소");
+    bottom.add(button1, BorderLayout.WEST);
+    bottom.add(button2, BorderLayout.EAST);
+
+    contentPane.add(top);
+    contentPane.add(bottom);
+    //새로운 contentPane으로 설정
+    frame.setContentPane(contentPane);
+
+    //새 contentPane 재배치 및 다시 그리기
+    frame.revalidate();
+    ;
+    frame.repaint();
   }
 
   /**
    * 1-b Select Item
    *
-   * @param status : 0
+   * @param status PAY - normal pay condition ERROR - error
    */
   private void pay_UI(int status) {
+    Container contentPane = getContentPane();
+    contentPane.setLayout(new BorderLayout());
+    if (status == ERROR) {
+      JLabel adminLabel = new JLabel("잔고 부족", JLabel.CENTER);
+      contentPane.add(adminLabel, BorderLayout.NORTH);
+      JButton button = new JButton("돌아가기");
+      button.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          item_list_UI(status);
+        }
+      });
+      contentPane.add(button, BorderLayout.SOUTH);
+    } else if (status == PAY) {
+      JLabel adminLabel = new JLabel("결제 완료", JLabel.CENTER);
+      contentPane.add(adminLabel, BorderLayout.NORTH);
+      JButton button = new JButton("돌아가기");
+      button.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          item_list_UI(status);
+        }
+      });
+      contentPane.add(button, BorderLayout.SOUTH);
+    }
+
+    //새로운 contentPane으로 설정
+    frame.setContentPane(contentPane);
+
+    //새 contentPane 재배치 및 다시 그리기
+    frame.revalidate();
+    ;
+    frame.repaint();
   }
 
   private void code_verify_UI(int status) {
+    Container contentPane = getContentPane();
+    contentPane.setLayout(new BorderLayout());
 
+    JLabel adminLabel = new JLabel("재고 확인", JLabel.CENTER);
+    contentPane.add(adminLabel, BorderLayout.NORTH);
+    //TODO : implement in this line
+    //새로운 contentPane으로 설정
+    frame.setContentPane(contentPane);
+
+    //새 contentPane 재배치 및 다시 그리기
+    frame.revalidate();
+    ;
+    frame.repaint();
   }
 
+  /**
+   * pay ok after insert_card
+   *
+   * @param status - item code
+   */
   private void item_UI(int status) {
+    Container contentPane = getContentPane();
+    contentPane.setLayout(new BorderLayout());
+
+    JLabel adminLabel = new JLabel(drink[status], JLabel.CENTER);
+    contentPane.add(adminLabel, BorderLayout.NORTH);
+    JPanel bottom = new JPanel();
+    JButton button = new JButton("예");
+    button.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        item_list_UI(status);
+      }
+    });
+    bottom.add(button);
+    contentPane.add(adminLabel, BorderLayout.NORTH);
+    contentPane.add(bottom, BorderLayout.SOUTH);
   }
 
   private void complete_prepay_UI(int status) {
+    //TODO : implement
   }
 
-  private void check_stock_UI(int status) {
+  /**
+   * 원래는 status만 존재, int[] 가 추가되어 item 재고가 들어가게 됨.
+   *
+   * @param status
+   */
+  private void check_stock_UI(int status, int[] item) {
     Container contentPane = getContentPane();
     contentPane.setLayout(new BorderLayout());
 
@@ -150,9 +255,53 @@ public class DVMUI extends JFrame {
     buttonPanel.add(button1);
     buttonPanel.add(button2);
     contentPane.add(buttonPanel, BorderLayout.SOUTH);
+    //새로운 contentPane으로 설정
+    frame.setContentPane(contentPane);
+
+    //새 contentPane 재배치 및 다시 그리기
+    frame.revalidate();
+    ;
+    frame.repaint();
   }
 
-  private void add_stock_UI(int status) {
+  private void add_stock_UI(int status, int[] item) {
+    Container contentPane = frame.getContentPane();
+    contentPane.setLayout(new BorderLayout());
+    if (status == DEF) {
+      String[] chocies = new String[20];
+      for (int i = 1; i <= 20; i++) {
+        choices[i - 1] = drink[i];
+      }
+      JComboBox<String> comboBox = new JComboBox<>(chocies);
+      contentPane.add(comboBox);
+
+      JTextField numberInput = new JTextField(10);
+      contentPane.add(numberInput);
+
+      JPanel bottom = new JPanel();
+      JButton button = new JButton("적용");
+      button.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          String selectedChoice = (String) comboBox.getSelectedItem();
+
+          String numberText = numberInput.getText();
+
+          //TODO : 에러 처리, integer이 아닌 경우
+          add_item(findStringIndex(drink, selectedChoice), Integer.parseInt(numberText));
+        }
+      });
+      contentPane.add(button);
+      JButton button2 = new JButton("메뉴");
+      contentPane.add(button2);
+    }
+    //새로운 contentPane으로 설정
+    frame.setContentPane(contentPane);
+
+    //새 contentPane 재배치 및 다시 그리기
+    frame.revalidate();
+    ;
+    frame.repaint();
   }
 
   /**
@@ -172,20 +321,21 @@ public class DVMUI extends JFrame {
     int ret;
 
     if (count < 1 || count > 20) {
-      this.item_list_UI(1);
+      this.item_list_UI(ERROR);
     } else {
-      //TODO : return type setting
       /**
-       * return -1 : error
-       * return 1 :
-       * return 2 :
+       * return 0 : 재고 존재
+       * return 1 : 재고 부족, 다른 곳에 재고 존재
+       * return 2 : 다른 곳에 재고 부족일때
        * return 3 : count > 20, count < 0
        */
       ret = dvmStock.check_stock(item_code, count);
       if (ret == 0) {
-        prepay_UI(status);
-      } else {
         pay_UI(status);
+      } else if (ret == 1) {
+        prepay_UI(status);
+      } else if (ret == 2) {
+        item_list_UI(ERROR);
       }
     }
   }
@@ -206,16 +356,28 @@ public class DVMUI extends JFrame {
   }
 
   /**
-   * 1-d Insert Card, 1-e Insert Card(결제, 선결제)
+   * 1-d Insert Card, 1-e Insert Card(결제, 선결제) send_card_num -> true -> 재고 있음 / false ->재고 없음, 잔액
+   * 부족(둘다 동일함)
    *
-   * @param card_id : card id in user input
-   *                                                                                                                                                                      TODO : require in 1-e sequence diagram
+   * @param card_id : card id in user input this->status -> PAY or PREPAY Check req b
+   *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      TODO : require in 1-e sequence diagram
    */
   public void insert_card(int card_id) {
-    if (dvmController.send_card_num(card_id)) {
-      item_UI(0);
-    } else {
-      pay_UI(0);
+    if (status == PAY) {
+      if (dvmController.send_card_num(card_id)) {
+        item_UI(0);
+      } else {
+        /**
+         * 다른 카드 입력 받는 창.
+         */
+        pay_UI(0);
+      }
+    } else if (status == PREPAY) {
+      if (dvmController.send_card_num(card_id)) {
+        complete_prepay_UI(status);
+      } else {
+        item_list_UI(ERROR);
+      }
     }
   }
 
@@ -226,8 +388,8 @@ public class DVMUI extends JFrame {
     int[] item;
 
     item = dvmStock.check_stock_all();
-    //TODO : add check item amount logic
-    check_stock_UI(this.status);
+
+    check_stock_UI(this.status, item);
   }
 
   /**
@@ -235,12 +397,13 @@ public class DVMUI extends JFrame {
    */
   public void show_menu() {
     admin_UI(this.status);
-    //TODO : add_item_menu status shift logic
   }
 
   public void add_item_menu() {
-    add_stock_UI(this.status);
-    //TODO : add_item status shift logic
+    int[] item;
+
+    item = dvmStock.check_stock_all();
+    add_stock_UI(DEF, item);
   }
 
   /**
@@ -250,10 +413,13 @@ public class DVMUI extends JFrame {
    * @param stock     : add item amount if add_item_admin is true : show add else : show fail add
    */
   public void add_item(int item_code, int stock) {
+    int[] item;
     if (dvmStock.add_item(item_code, stock)) {
-      check_stock_UI(this.status);
+      item = dvmStock.check_stock_all();
+      check_stock_UI(DEF, item);
     } else {
-      check_stock_UI(this.status);
+      item = dvmStock.check_stock_all();
+      check_stock_UI(DEF, item);
     }
   }
 }

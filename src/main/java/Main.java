@@ -15,7 +15,7 @@ public class Main {
 //        dvmController.runClient2();
         server_dvmController.res_stock_msg();
         cli_dvmController.request_stock_msg(3, 4);
-//        cli2_dvmController.request_stock_msg(3, 5);
+        cli2_dvmController.request_stock_msg(3, 5);
 //        cli_dvmController.request_stock_msg(3, 6);
 //        cli_dvmController.request_stock_msg(3, 7);
 

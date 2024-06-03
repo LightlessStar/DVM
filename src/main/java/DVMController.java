@@ -251,6 +251,7 @@ public class DVMController {
                 writer.close();
                 reader.close();
                 socket.close();
+                System.out.println("client fin");
             } catch (Exception e) {
                 throw new RuntimeException("Error closing streams", e);
             }

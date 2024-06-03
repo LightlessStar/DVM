@@ -8,7 +8,7 @@ public class DVMStock {
         dvmController= new DVMController();
         Is_our_item=new boolean[20];
         for(int i=0;i<item.length;i++){
-            if(i<=7){
+            if(i<7){
                 item[i]=i;
                 Is_our_item[i]=true;
             }else{
@@ -19,7 +19,7 @@ public class DVMStock {
     }
 
     public int check_stock(int item_code, int count){
-        if(item[item_code-1]==-1 || item[item_code-1]==0){
+        if(!Is_our_item[item_code-1] || item[item_code-1]<count){
             if(dvmController.request_stock_msg(item_code, count)){
                 return 1;
             }else{
@@ -27,8 +27,10 @@ public class DVMStock {
             }
         }else if(count>20 || count<0) {
             return 3;
+        }else {
+            item[item_code-1]-=count;
+            return 0;
         }
-        return -1;
     }
 
     public int[] check_stock_all() {

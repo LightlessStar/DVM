@@ -1,41 +1,41 @@
 
 public class DVMStock {
-
-  int[] item;
-  boolean[] Is_our_item;
-  DVMController dvmController;
-
-  public DVMStock() {
-    item = new int[20];
-    dvmController = new DVMController();
-    Is_our_item = new boolean[20];
-    for (int i = 0; i < item.length; i++) {
-      if (i <= 7) {
-        item[i] = i;
-        Is_our_item[i] = true;
-      } else {
-        item[i] = 0;
-        Is_our_item[i] = false;
-      }
+    int[] item;
+    boolean[] Is_our_item;
+    DVMController dvmController;
+    public DVMStock() {
+        item = new int[20];
+        dvmController= new DVMController();
+        Is_our_item=new boolean[20];
+        for(int i=0;i<item.length;i++){
+            if(i<7){
+                item[i]=i;
+                Is_our_item[i]=true;
+            }else{
+                item[i]=0;
+                Is_our_item[i]=false;
+            }
+        }
     }
-  }
 
-  public int check_stock(int item_code, int count) {
-    if (item[item_code - 1] == -1 || item[item_code - 1] == 0) {
-      if (dvmController.request_stock_msg(item_code, count)) {
-        return 1;
-      } else {
-        return 2;
-      }
-    } else if (count > 20 || count < 0) {
-      return 3;
+    public int check_stock(int item_code, int count){
+        if(!Is_our_item[item_code-1] || item[item_code-1]<count){
+            if(dvmController.request_stock_msg(item_code, count)){
+                return 1;
+            }else{
+                return 2;
+            }
+        }else if(count>20 || count<0) {
+            return 3;
+        }else {
+            item[item_code-1]-=count;
+            return 0;
+        }
     }
-    return 0;
-  }
 
-  public int[] check_stock_all() {
-    return item;
-  }
+    public int[] check_stock_all() {
+        return item;
+    }
 
   public boolean add_item(int item_code, int stock) {
     if (Is_our_item[item_code - 1]) {

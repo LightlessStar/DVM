@@ -37,17 +37,17 @@ public class DVMStock {
         return item;
     }
 
-    public boolean add_item(int item_code, int stock) {
-        if(Is_our_item[item_code-1]) {
-            int temp = item[item_code - 1];
-            item[item_code - 1] += stock;
-            if (item[item_code - 1] - temp == stock) {
-                return true;
-            } else {
-                return false;
-            }
-        }else{
-            return false;
-        }
+  public boolean add_item(int item_code, int stock) {
+    if (Is_our_item[item_code - 1]) {
+      int temp = item[item_code - 1];
+      item[item_code - 1] += stock;
+      if (item[item_code - 1] - temp == stock) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
     }
+  }
 }

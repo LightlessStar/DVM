@@ -20,8 +20,8 @@ public class DVMUI extends JFrame {
 
   private int status;
   final private JFrame frame;
-  private DVMStock dvmStock;
-  private DVMController dvmController;
+  private DVMStock dvmStock = new DVMStock();
+  private DVMController dvmController = new DVMController();
 
   private static int findStringIndex(String[] array, String target) {
     for (int i = 0; i < array.length; i++) {
@@ -54,8 +54,9 @@ public class DVMUI extends JFrame {
         public void actionPerformed(ActionEvent e) {
           JButton b = (JButton) e.getSource();
           String buttonText = b.getText();
-          int status = findStringIndex(drink, buttonText);
-//                    select_item(status);
+          int itemCode = findStringIndex(drink, buttonText);
+          //TODO : select amount logic, tmp 1 buy
+          select_item(itemCode, 1);
         }
       });
       buttonPanel1.add(button);
@@ -89,7 +90,7 @@ public class DVMUI extends JFrame {
 
     //새 contentPane 재배치 및 다시 그리기
     frame.revalidate();
-    ;
+
     frame.repaint();
   }
 
@@ -101,17 +102,19 @@ public class DVMUI extends JFrame {
   private void prepay_UI(int status) {
     //TODO : set drink string using status
     Container contentPane = getContentPane();
+    contentPane.setLayout(new GridLayout(2, 1));
     String drinkSomething = drink[status];
 
     String printTitle = "현재 재고가 부족합니다.";
-    String printSub = "선결제를 진행하고 구매할 수 있습니다.\n " + drinkSomething + "\n선결제를 진행하시겠습니까?\n";
+    String printSub = "선결제를 진행하고 구매할 수 있습니다.\n " + drinkSomething + " \n선결제를 진행하시겠습니까?\n";
 
-    JPanel top = new JPanel(new GridLayout(1, 3));
+    JPanel top = new JPanel(new GridLayout(2, 1));
     JLabel title = new JLabel(printTitle);
+    JLabel subTitle = new JLabel(printSub);
     top.add(title, BorderLayout.NORTH);
-    JPanel subTitle = new JPanel();
-    top.add(subTitle, BorderLayout.CENTER);
-    JPanel bottom = new JPanel(new GridLayout(2, 1));
+    top.add(subTitle, BorderLayout.SOUTH);
+
+    JPanel bottom = new JPanel(new GridLayout(1, 2));
     JButton button1 = new JButton("구매");
     JButton button2 = new JButton("취소");
     bottom.add(button1, BorderLayout.WEST);
@@ -173,8 +176,21 @@ public class DVMUI extends JFrame {
     Container contentPane = getContentPane();
     contentPane.setLayout(new BorderLayout());
 
-    JLabel adminLabel = new JLabel("재고 확인", JLabel.CENTER);
+    JLabel adminLabel = new JLabel("선결제 코드 확인", JLabel.CENTER);
     contentPane.add(adminLabel, BorderLayout.NORTH);
+
+    JTextField prepayCode = new JTextField();
+
+    JButton submit = new JButton();
+
+    submit.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        String code = prepayCode.getText();
+        enter_code(code);
+      }
+    });
+
     //TODO : implement in this line
     //새로운 contentPane으로 설정
     frame.setContentPane(contentPane);
@@ -186,7 +202,7 @@ public class DVMUI extends JFrame {
   }
 
   /**
-   * pay ok after insert_card
+   * pay ok after insert_card or After code input
    *
    * @param status - item code
    */
@@ -212,9 +228,9 @@ public class DVMUI extends JFrame {
   private void complete_prepay_UI(int status) {
     //TODO : implement
     //TODO : use code_and_loc
-    String[] str;
+    String[] str = {"1", "2", "3"};
 
-    str = dvmController.code_and_loc();
+//    str = dvmController.code_and_loc();
     Container contentPane = getContentPane();
     contentPane.setLayout(new GridLayout(1, 6));
 
@@ -365,9 +381,9 @@ public class DVMUI extends JFrame {
        */
       ret = dvmStock.check_stock(item_code, count);
       if (ret == 0) {
-        pay_UI(status);
+        pay_UI(PAY);
       } else if (ret == 1) {
-        prepay_UI(status);
+        prepay_UI(item_code);
       } else if (ret == 2) {
         item_list_UI(ERROR);
       }
@@ -383,9 +399,9 @@ public class DVMUI extends JFrame {
 
   public void enter_code(String verify_code) {
     if (dvmController.enter_code(verify_code)) {
-      item_UI(0);
+      item_UI(PREPAY);
     } else {
-      item_list_UI(0);
+      item_list_UI(PAY);
     }
   }
 
@@ -394,7 +410,7 @@ public class DVMUI extends JFrame {
    * 부족(둘다 동일함)
    *
    * @param card_id : card id in user input this->status -> PAY or PREPAY Check req b
-   *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                TODO : require in 1-e sequence diagram
+   *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   TODO : require in 1-e sequence diagram
    */
   public void insert_card(int card_id) {
     if (status == PAY) {

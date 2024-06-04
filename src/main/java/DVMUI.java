@@ -20,8 +20,8 @@ public class DVMUI extends JFrame {
 
   private int status;
   final private JFrame frame;
-  private DVMStock dvmStock = new DVMStock();
-  private DVMController dvmController = new DVMController();
+  private DVMStock dvmStock;
+  private DVMController dvmController;
 
   private static int findStringIndex(String[] array, String target) {
     for (int i = 0; i < array.length; i++) {
@@ -33,9 +33,20 @@ public class DVMUI extends JFrame {
   }
 
 
-  public DVMUI() {
+  public DVMUI(DVMStock dvmStock, DVMController dvmController) {
+    this.dvmStock = dvmStock;
+    this.dvmController = dvmController;
     frame = new JFrame("DVM TEAM6");
-//    this->frame = frame;
+    frame.setSize(600, 300);
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    item_list_UI(DEF);
+    frame.setVisible(true); // 화면에 프레임 출력
+  }
+
+  public DVMUI() {
+    this.dvmStock = new DVMStock();
+    this.dvmController = new DVMController();
+    frame = new JFrame("DVM TEAM6");
     frame.setSize(600, 300);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     item_list_UI(DEF);
@@ -44,6 +55,8 @@ public class DVMUI extends JFrame {
 
   private void item_list_UI(int status) {
     Container contentPane = frame.getContentPane();
+    contentPane.setLayout(new GridLayout(2, 1));
+    contentPane.removeAll();
     //4 * 5 짜리 jpanel을 만들어 jframe에 부착하는 작업.
     JPanel buttonPanel1 = new JPanel();
     buttonPanel1.setLayout(new GridLayout(4, 5));
@@ -90,44 +103,54 @@ public class DVMUI extends JFrame {
 
     //새 contentPane 재배치 및 다시 그리기
     frame.revalidate();
-
     frame.repaint();
   }
 
   /**
-   * 1-b Select Item
+   * 1-b Select Item 1-e 선결제 파트가 실제로 진행되어야 함.
    *
    * @param status - 1 ~ 20 : drink status
    */
   private void prepay_UI(int status) {
     //TODO : set drink string using status
     Container contentPane = getContentPane();
+    contentPane.removeAll();
     contentPane.setLayout(new GridLayout(2, 1));
     String drinkSomething = drink[status];
 
     String printTitle = "현재 재고가 부족합니다.";
-    String printSub = "선결제를 진행하고 구매할 수 있습니다.\n " + drinkSomething + " \n선결제를 진행하시겠습니까?\n";
+    String printSub = "선결제를 진행하고 구매할 수 있습니다.\n " + drinkSomething;
+    String cardTitle = "카드 번호를 입력해주세요";
 
-    JPanel top = new JPanel(new GridLayout(2, 1));
+    JPanel top = new JPanel(new GridLayout(4, 1));
     JLabel title = new JLabel(printTitle);
     JLabel subTitle = new JLabel(printSub);
-    top.add(title, BorderLayout.NORTH);
-    top.add(subTitle, BorderLayout.SOUTH);
+    JLabel card = new JLabel(cardTitle);
+    JTextField cardId = new JTextField();
+    top.add(title);
+    top.add(subTitle);
+    top.add(card);
+    top.add(cardId);
 
     JPanel bottom = new JPanel(new GridLayout(1, 2));
     JButton button1 = new JButton("구매");
-    JButton button2 = new JButton("취소");
-    bottom.add(button1, BorderLayout.WEST);
-    bottom.add(button2, BorderLayout.EAST);
+    button1.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        int card_id = Integer.parseInt(cardId.getText());
+        insert_card(card_id);
+      }
+    });
+    //그 구현상에는 취소버튼이 없어...
+//    JButton button2 = new JButton("취소");
+    bottom.add(button1);
+//    bottom.add(button2);
 
     contentPane.add(top);
     contentPane.add(bottom);
     //새로운 contentPane으로 설정
     frame.setContentPane(contentPane);
-
-    //새 contentPane 재배치 및 다시 그리기
     frame.revalidate();
-    ;
     frame.repaint();
   }
 
@@ -138,6 +161,7 @@ public class DVMUI extends JFrame {
    */
   private void pay_UI(int status) {
     Container contentPane = getContentPane();
+    contentPane.removeAll();
     contentPane.setLayout(new BorderLayout());
     if (status == ERROR) {
       JLabel adminLabel = new JLabel("잔고 부족", JLabel.CENTER);
@@ -165,23 +189,22 @@ public class DVMUI extends JFrame {
 
     //새로운 contentPane으로 설정
     frame.setContentPane(contentPane);
-
     //새 contentPane 재배치 및 다시 그리기
     frame.revalidate();
-    ;
     frame.repaint();
   }
 
   private void code_verify_UI(int status) {
     Container contentPane = getContentPane();
-    contentPane.setLayout(new BorderLayout());
+    contentPane.removeAll();
+    contentPane.setLayout(new GridLayout(3, 1));
 
-    JLabel adminLabel = new JLabel("선결제 코드 확인", JLabel.CENTER);
-    contentPane.add(adminLabel, BorderLayout.NORTH);
+    JLabel adminLabel = new JLabel("선결제 코드 확인");
+    contentPane.add(adminLabel);
 
     JTextField prepayCode = new JTextField();
 
-    JButton submit = new JButton();
+    JButton submit = new JButton("선결제 번호 입력");
 
     submit.addActionListener(new ActionListener() {
       @Override
@@ -191,23 +214,22 @@ public class DVMUI extends JFrame {
       }
     });
 
-    //TODO : implement in this line
-    //새로운 contentPane으로 설정
-    frame.setContentPane(contentPane);
+    contentPane.add(prepayCode, BorderLayout.CENTER);
+    contentPane.add(submit, BorderLayout.SOUTH);
 
-    //새 contentPane 재배치 및 다시 그리기
+    frame.setContentPane(contentPane);
     frame.revalidate();
-    ;
     frame.repaint();
   }
 
   /**
-   * pay ok after insert_card or After code input
+   * pay ok after insert_card or After code input is ok
    *
    * @param status - item code
    */
   private void item_UI(int status) {
     Container contentPane = getContentPane();
+    contentPane.removeAll();
     contentPane.setLayout(new BorderLayout());
 
     JLabel adminLabel = new JLabel(drink[status], JLabel.CENTER);
@@ -223,6 +245,13 @@ public class DVMUI extends JFrame {
     bottom.add(button);
     contentPane.add(adminLabel, BorderLayout.NORTH);
     contentPane.add(bottom, BorderLayout.SOUTH);
+
+    //새로운 contentPane으로 설정
+    frame.setContentPane(contentPane);
+
+    //새 contentPane 재배치 및 다시 그리기
+    frame.revalidate();
+    frame.repaint();
   }
 
   private void complete_prepay_UI(int status) {
@@ -232,6 +261,7 @@ public class DVMUI extends JFrame {
 
 //    str = dvmController.code_and_loc();
     Container contentPane = getContentPane();
+    contentPane.removeAll();
     contentPane.setLayout(new GridLayout(1, 6));
 
     JLabel title1 = new JLabel("선결제 완료");
@@ -256,9 +286,7 @@ public class DVMUI extends JFrame {
     //새로운 contentPane으로 설정
     frame.setContentPane(contentPane);
 
-    //새 contentPane 재배치 및 다시 그리기
     frame.revalidate();
-    ;
     frame.repaint();
   }
 
@@ -269,22 +297,52 @@ public class DVMUI extends JFrame {
    */
   private void check_stock_UI(int status, int[] item) {
     Container contentPane = getContentPane();
-    contentPane.setLayout(new BorderLayout());
+    //removeAll이 없어서 깨지는 현상이 있었음.
+    contentPane.removeAll();
+    contentPane.setLayout(new GridLayout(3, 1));
 
     // "관리자메뉴" 라벨 추가
     JLabel adminLabel = new JLabel("재고 확인", JLabel.CENTER);
     contentPane.add(adminLabel, BorderLayout.NORTH);
 
-    //TODO : Implement in this line
+    JPanel stock = new JPanel();
+    stock.setLayout(new GridLayout(4, 5));
+    for (int i = 1; i <= 20; i++) {
+      JLabel eachStock = new JLabel(drink[i] + " : " + item[i - 1]);
+      stock.add(eachStock);
+    }
+    JPanel bottom = new JPanel();
+    JButton button1 = new JButton("돌아가기");
+    button1.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        show_menu();
+      }
+    });
+    JButton button2 = new JButton("음료 선택으로 돌아가기");
+    button2.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        item_list_UI(DEF);
+      }
+    });
+    bottom.add(button1);
+    bottom.add(button2);
+    contentPane.add(stock);
+    contentPane.add(bottom);
 
+    frame.setContentPane(contentPane);
+    frame.revalidate();
+    frame.repaint();
   }
 
   private void admin_UI(int status) {
     Container contentPane = getContentPane();
+    contentPane.removeAll();
     contentPane.setLayout(new BorderLayout());
 
     // "관리자메뉴" 라벨 추가
-    JLabel adminLabel = new JLabel("관리자메뉴", JLabel.CENTER);
+    JLabel adminLabel = new JLabel("관리자메뉴");
     contentPane.add(adminLabel, BorderLayout.NORTH);
 
     JPanel buttonPanel = new JPanel();
@@ -310,25 +368,29 @@ public class DVMUI extends JFrame {
 
     //새 contentPane 재배치 및 다시 그리기
     frame.revalidate();
-    ;
     frame.repaint();
   }
 
   private void add_stock_UI(int status, int[] item) {
-    Container contentPane = frame.getContentPane();
+    Container contentPane = getContentPane();
+    contentPane.removeAll();
     contentPane.setLayout(new BorderLayout());
     if (status == DEF) {
       String[] choices = new String[20];
       for (int i = 1; i <= 20; i++) {
         choices[i - 1] = drink[i];
       }
+      JPanel panel = new JPanel();
+      panel.setLayout(new GridLayout(1, 2));
       JComboBox<String> comboBox = new JComboBox<>(choices);
-      contentPane.add(comboBox);
+      panel.add(comboBox);
 
       JTextField numberInput = new JTextField(10);
-      contentPane.add(numberInput);
+      panel.add(numberInput);
 
+      contentPane.add(panel, BorderLayout.CENTER);
       JPanel bottom = new JPanel();
+      bottom.setLayout(new GridLayout(1, 2));
       JButton button = new JButton("적용");
       button.addActionListener(new ActionListener() {
         @Override
@@ -341,16 +403,22 @@ public class DVMUI extends JFrame {
           add_item(findStringIndex(drink, selectedChoice), Integer.parseInt(numberText));
         }
       });
-      contentPane.add(button);
-      JButton button2 = new JButton("메뉴");
-      contentPane.add(button2);
+      bottom.add(button);
+      JButton button2 = new JButton("돌아가기");
+      button2.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          admin_UI(DEF);
+        }
+      });
+      bottom.add(button2);
+      contentPane.add(bottom, BorderLayout.SOUTH);
     }
     //새로운 contentPane으로 설정
     frame.setContentPane(contentPane);
 
     //새 contentPane 재배치 및 다시 그리기
     frame.revalidate();
-    ;
     frame.repaint();
   }
 
@@ -410,7 +478,7 @@ public class DVMUI extends JFrame {
    * 부족(둘다 동일함)
    *
    * @param card_id : card id in user input this->status -> PAY or PREPAY Check req b
-   *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   TODO : require in 1-e sequence diagram
+   *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          TODO : require in 1-e sequence diagram
    */
   public void insert_card(int card_id) {
     if (status == PAY) {

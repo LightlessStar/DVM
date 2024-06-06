@@ -32,7 +32,6 @@ public class DVMUI extends JFrame {
         return -1;
     }
 
-
     public DVMUI(DVMStock dvmStock, DVMController dvmController) {
         this.dvmStock = dvmStock;
         this.dvmController = dvmController;
@@ -55,9 +54,18 @@ public class DVMUI extends JFrame {
 
     private void item_list_UI(int status) {
         Container contentPane = frame.getContentPane();
-        contentPane.setLayout(new GridLayout(2, 1));
+        contentPane.setLayout(new GridLayout(3, 1));
         contentPane.removeAll();
+
+        JPanel top = new JPanel();
+        top.setLayout(new GridLayout(1, 2));
+        JLabel top_label = new JLabel("개수를 입력해주세요");
+
         //4 * 5 짜리 jpanel을 만들어 jframe에 부착하는 작업.
+        JTextField text = new JTextField();
+        top.add(top_label);
+        top.add(text);
+        contentPane.add(top);
         JPanel buttonPanel1 = new JPanel();
         buttonPanel1.setLayout(new GridLayout(4, 5));
         for (int i = 1; i <= 20; i++) {
@@ -68,14 +76,13 @@ public class DVMUI extends JFrame {
                     JButton b = (JButton) e.getSource();
                     String buttonText = b.getText();
                     int itemCode = findStringIndex(drink, buttonText);
-                    //TODO : select amount logic, tmp 1 buy
-                    select_item(itemCode, 1);
+                    int num = Integer.parseInt(text.getText());
+                    select_item(itemCode, num);
                 }
             });
             buttonPanel1.add(button);
         }
         JPanel buttonPanel2 = new JPanel();
-
         buttonPanel2.setLayout(new GridLayout(1, 2));
         JButton button = new JButton("선결제 코드 인증");
         button.addActionListener(new ActionListener() {
@@ -455,24 +462,24 @@ public class DVMUI extends JFrame {
      */
     public void select_item(int item_code, int count) {
         int ret;
+        /**
+         * return 0 : 재고 존재
+         * return 1 : 재고 부족, 다른 곳에 재고 존재
+         * return 2 : 다른 곳에 재고 부족일때
+         * return 3 : count > 20, count < 0
+         */
+        //TODO : maybe error, but work well soon
+        ret = dvmStock.check_stock(item_code, count);
 
-        if (count < 1 || count > 20) {
-            this.item_list_UI(ERROR);
-        } else {
-            /**
-             * return 0 : 재고 존재
-             * return 1 : 재고 부족, 다른 곳에 재고 존재
-             * return 2 : 다른 곳에 재고 부족일때
-             * return 3 : count > 20, count < 0
-             */
-            ret = dvmStock.check_stock(item_code, count);
-            if (ret == 0) {
-                pay_UI(DEF);
-            } else if (ret == 1) {
+        if (ret == 0) {
+            pay_UI(DEF);
+        } else if (ret == 1) {
+            boolean req_bool = dvmController.request_stock_msg(item_code, count);
+            if (req_bool == true) {
                 prepay_UI(item_code);
-            } else if (ret == 2) {
-                item_list_UI(ERROR);
             }
+        } else if (ret == -1) {
+            item_list_UI(ERROR);
         }
     }
 
@@ -484,7 +491,7 @@ public class DVMUI extends JFrame {
     }
 
     public void enter_code(String verify_code) {
-        if (dvmController.enter_code(verify_code)) {
+        if (dvmController.send_code(verify_code)) {
             item_UI(PREPAY);
         } else {
             item_list_UI(PAY);
@@ -496,7 +503,7 @@ public class DVMUI extends JFrame {
      * 부족(둘다 동일함)
      *
      * @param card_id : card id in user input this->status -> PAY or PREPAY Check req b
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                TODO : require in 1-e sequence diagram
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      TODO : require in 1-e sequence diagram
      */
     public void insert_card(int card_id) {
         if (status == PAY) {

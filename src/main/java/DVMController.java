@@ -82,6 +82,7 @@ public class DVMController {
      */
     public String[] code_and_loc() {
         String[] code_team_xy = new String[4];
+
         return code_team_xy;
     }
 
@@ -110,7 +111,7 @@ public class DVMController {
 
                     JSONObject other_dvm_msg = new JSONObject(reader.readLine());
                     System.out.println("Server : receive msg " + other_dvm_msg);
-                    System.out.println("Server : receive item_code, count" + other_dvm_msg.get());
+//                    System.out.println("Server : receive item_code, count" + other_dvm_msg.get());
 
 
                     JSONObject res_msg = new JSONObject();

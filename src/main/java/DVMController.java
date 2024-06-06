@@ -26,7 +26,7 @@ public class DVMController {
     private Bank bank; //이거 왜 없어ㅓㅓㅓㅓㅓDCD에 넣어야 해
     private int[] price; //결제 금액 저장용 변수
 
-    private HashMap<String, int> code_stock;
+    private HashMap<String, Integer> code_stock;
     private DVMStock dvmStock;
     private int tmp_item;
     private int tmp_count;
@@ -68,7 +68,7 @@ public class DVMController {
 
     public int send_code(String verify_code) {
         if (code_stock.containsKey(verify_code)) {
-            int ret = code_stock.get(verify_code);
+            Integer ret = code_stock.get(verify_code);
             code_stock.remove(verify_code);
             return ret;
         } else {
@@ -110,6 +110,7 @@ public class DVMController {
                 return true;
             }
         }
+        return false;
     }
 
     /**

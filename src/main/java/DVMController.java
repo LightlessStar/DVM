@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.*;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.json.JSONObject;
 //예제 파일 합치기
@@ -11,7 +12,7 @@ public class DVMController {
     private JSONObject prepayment_msg_JSON;
     private final int[] coord_xy; //주어진 우리 DVM 좌표
     private HashMap<String, int[]> other_dvm_coord;
-    private HashMap<String, JSONObject> other_dvm_stock;
+    private HashMap<String, Integer> other_dvm_stock;
     private String verify_codes[];// 새로 추가된 인증코드용 배열
     //Socket 통신 관련 변수는 메서드 안에서만 쓴다면 DCD에서 제외해도 될 듯
     private ServerSocket socket;
@@ -32,7 +33,7 @@ public class DVMController {
         prepayment_msg_JSON = new JSONObject();
         coord_xy = new int[]{27, 80};
         other_dvm_coord = new HashMap<String, int[]>();
-        other_dvm_stock = new HashMap<String, JSONObject>();
+        other_dvm_stock = new HashMap<String, Integer>();
         verify_codes = new String[100];
         bank = new Bank();
         for (int i = 0; i < price.length; i++) {
@@ -60,8 +61,8 @@ public class DVMController {
     }
 
     public boolean send_code(String verify_code) {
-        for(int i=0; i<verify_codes.length; i++) {
-            if(verify_code.equals(verify_codes[i])){
+        for (int i = 0; i < verify_codes.length; i++) {
+            if (verify_code.equals(verify_codes[i])) {
                 return true;
             }
         }
@@ -91,7 +92,7 @@ public class DVMController {
      * 우리 DVM 서버에서 지속적으로 Thread로 돌면서 stock_msg 통신 받아서 응답하는 함수
      * stock msg인지 prepay msg인지 JSON 항목으로 구분
      */
-    public JSONObject res_stock_msg(JSONObject) {
+    public JSONObject res_stock_msg() {
         Thread serverThread = new Thread(() -> {
             try (ServerSocket serverSocket = new ServerSocket(PORT)) {
                 System.out.println("Server is listening on PORT " + PORT);
@@ -201,16 +202,15 @@ public class DVMController {
                 writer.println(msg);
                 System.out.println("Client : send to server" + msg);
 
+                JSONObject response_other_dvm = new JSONObject(reader.readLine());
+                System.out.println("Client : server res receive!!" + response_other_dvm);
 
-                //Message response = service.receiveMessage(Message.class);
-                JSONObject msg_content = new JSONObject(response_other_dvm);
-                System.out.println(msg_content);
-                //msg_content = response.getJSONObject("msg_content");
-                other_dvm_stock.put(msg_content.get("src_id").toString(), msg_content);
+                //응답 받은 것을 저장
+                other_dvm_stock.put(response_other_dvm.get("src_id").toString(), Integer.parseInt(response_other_dvm.getJSONObject("msg_content").get("item_num").toString()));
                 int[] coor = new int[2];
-                coor[0] = msg_content.getJSONObject("msg_content").getInt("coor_x");
-                coor[1] = msg_content.getJSONObject("msg_content").getInt("coor_y");
-                other_dvm_coord.put(msg_content.get("src_id").toString(), coor);
+                coor[0] = Integer.parseInt(response_other_dvm.getJSONObject("msg_content").get("coor_x").toString());
+                coor[1] = Integer.parseInt(response_other_dvm.getJSONObject("msg_content").get("coor_y").toString());
+                other_dvm_coord.put(response_other_dvm.get("src_id").toString(), coor);
 
                 try {
                     writer.close();
@@ -229,10 +229,78 @@ public class DVMController {
         clientThread.start();
         return null;
     }
-    private JSONObject req_prepay_msg(JSONObject msg) {
+
+    /**
+     * 1-e 선결제 -> item, count
+     */
+    private String[] prepay_info(int item, int count) {
+        //item 보유 중이고, 가장 거리가 가까운 dvm id 선별
+        //충분한 item 있는 거만 뽑아서 따로 배열 만듦.
+        HashMap<String, Integer> item_owner_so_many = new HashMap<>();
+        for (Map.Entry<String, Integer> entry : other_dvm_stock.entrySet()) {
+            if (entry.getValue() >= count) {
+                item_owner_so_many.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        //가장 거리 가까운 거 dvm 뽑기
+        String dst_dvm_id = "";
+        double min_distance = -1;
+        for (Map.Entry<String, int[]> entry_coord : other_dvm_coord.entrySet()) {
+            for (Map.Entry<String, Integer> entry_stock : item_owner_so_many.entrySet()) {
+                //좌표 저장된 것 중 충분한 item 많은 거 dvm만 탐색.
+                if (entry_coord.getKey().equals(entry_stock.getKey())) {
+                    //최단거리 계산
+                    int[] coord = entry_coord.getValue();
+                    int del_x = coord[0] - coord_xy[0];
+                    int del_y = coord[1] - coord_xy[1];
+                    double distance = Math.sqrt(del_x * del_x + del_y * del_y);
+
+                    if (min_distance == -1) {
+                        min_distance = distance;
+                        dst_dvm_id = entry_coord.getKey();
+                    } else if (min_distance > distance) {
+                        min_distance = distance;
+                        dst_dvm_id = entry_coord.getKey();
+                    }
+                }
+            }
+        }
+
+        String[] ret_str = new String[3];
+        //min_distance가 -1이면 선결제 불가능
+        if (min_distance == -1) {
+            ret_str[0] = "0";
+            return ret_str;
+        } else {
+            ret_str[0] = "";
+            ret_str[1] = dst_dvm_id;
+            ret_str[2] = Double.toString(min_distance);
+            prepayment_msg_JSON = new JSONObject()
+                    .put("msg_type", "req_prepay")
+                    .put("src_id", "Team6")
+                    .put("dst_id", dst_dvm_id)
+                    .put("msg_content", new JSONObject()
+                            .put("item_code", item)
+                            .put("item_num", count)
+                            .put("cert_code", ret_str[0])
+                    );
+
+            req_prepayment_msg(prepayment_msg_JSON);
+
+            return ret_str;
+        }
+        //선결제 불가능하면 return string[0] = "0" 으로 return
+        //선결제 가능하면 string[0] 코드 string[1] 팀명, x y string[2] 거리
+    }
+
+    /**
+     * 다른 DVM에 prepay 보내는 함수
+     */
+    private JSONObject req_prepayment_msg(JSONObject prepayment_msg_JSON) {
         Thread clientThread = new Thread(() -> {
 
-            try (Socket socket = new Socket("localhost", PORT)) {
+            try (Socket socket = new Socket(HOST, PORT)) {
                 PrintWriter writer;
                 BufferedReader reader;
                 try {
@@ -243,11 +311,8 @@ public class DVMController {
                 }
 
                 // 서버로 메시지를 보내고 응답을 받습니다.
-                writer.println(msg);
-                System.out.println("i'm client : send to server" + msg);
-
-                String response_other_dvm = reader.readLine();
-                System.out.println("i'm client : server res receive!!" + response_other_dvm);
+                writer.println(prepayment_msg_JSON);
+                System.out.println("Client : send to server" + prepayment_msg_JSON);
 
                 JSONObject response_other_dvm = new JSONObject(reader.readLine());
                 System.out.println("Client : server res receive!!" + response_other_dvm);

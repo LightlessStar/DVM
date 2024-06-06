@@ -11,14 +11,9 @@ public class Bank {
     }
 
     public boolean certify_pay(int card_id, int charge) {
-        System.out.println("in certify pay");
-        System.out.println("card_id: " + card_id);
-        System.out.println("charge: " + charge);
         for (int i = 0; i < card.length; i++) {
-
             if (card[i].card_check(card_id) && card[i].cash_check(charge)) {
                 card[i].pay(charge);
-                System.out.println("certify pay ok");
                 return true;
             }
         }

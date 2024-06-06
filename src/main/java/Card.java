@@ -8,9 +8,6 @@ public class Card {
     }
 
     public boolean card_check(int Card_id) {
-        System.out.println(card_id);
-        System.out.println(Card_id);
-        System.out.println(cash);
         if (card_id == Card_id) {
             return true;
         } else {

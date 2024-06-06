@@ -262,8 +262,10 @@ public class DVMUI extends JFrame {
         contentPane.removeAll();
         contentPane.setLayout(new BorderLayout());
 
-        JLabel adminLabel = new JLabel(drink[status], JLabel.CENTER);
-        contentPane.add(adminLabel, BorderLayout.NORTH);
+        JPanel panel = new JPanel();
+        JLabel adminLabel = new JLabel(drink[tmp_item]);
+        panel.add(adminLabel);
+        contentPane.add(panel, BorderLayout.NORTH);
         JPanel bottom = new JPanel();
         JButton button = new JButton("예");
         button.addActionListener(new ActionListener() {
@@ -286,10 +288,9 @@ public class DVMUI extends JFrame {
 
     private void complete_prepay_UI(int status) {
         //TODO : implement
-        //TODO : use code_and_loc
         String[] str = {"1", "2", "3"};
 
-//    str = dvmController.code_and_loc();
+
         Container contentPane = getContentPane();
         contentPane.removeAll();
         contentPane.setLayout(new GridLayout(1, 6));
@@ -513,7 +514,7 @@ public class DVMUI extends JFrame {
      * 부족(둘다 동일함)
      *
      * @param card_id : card id in user input this->status -> PAY or PREPAY Check req b
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        TODO : require in 1-e sequence diagram
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     TODO : require in 1-e sequence diagram
      */
     public void insert_card(int card_id) {
         int charge = price[tmp_item] * tmp_count;
@@ -529,7 +530,7 @@ public class DVMUI extends JFrame {
         } else if (status == PREPAY) {
             if (dvmController.send_card_num(card_id, charge)) {
                 str = dvmController.prepay_info(tmp_item, tmp_count);
-                complete_prepay_UI(status);
+                complete_prepay_UI(tmp_item);
             } else {
                 item_list_UI(ERROR);
             }

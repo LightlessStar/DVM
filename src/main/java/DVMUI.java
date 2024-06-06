@@ -1,3 +1,5 @@
+import sun.security.x509.IPAddressName;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -53,6 +55,16 @@ public class DVMUI extends JFrame {
         frame.setVisible(true); // 화면에 프레임 출력
     }
 
+    public DVMUI(DVMStock dvmStock) {
+        this.dvmStock = dvmStock;
+        this.dvmController = new DVMController();
+        frame = new JFrame("DVM TEAM6");
+        frame.setSize(600, 300);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        item_list_UI(DEF);
+        frame.setVisible(true); // 화면에 프레임 출력
+    }
+
     public DVMUI() {
         this.dvmStock = new DVMStock();
         this.dvmController = new DVMController();
@@ -65,9 +77,20 @@ public class DVMUI extends JFrame {
 
     private void item_list_UI(int status) {
         Container contentPane = frame.getContentPane();
-        contentPane.setLayout(new GridLayout(2, 1));
+        JLabel title = new JLabel("DVM TEAM6");
+        contentPane.setLayout(new GridLayout(4, 1));
         contentPane.removeAll();
         //4 * 5 짜리 jpanel을 만들어 jframe에 부착하는 작업.
+        if (status == ERROR) {
+            title.setText("결제에 실패했습니다. 다시 확인해주세요");
+        }
+        contentPane.add(title);
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(2, 1));
+        JLabel choice = new JLabel("음료 개수를 선택해주세요");
+        JTextField text = new JTextField(10);
+        panel.add(choice);
+        panel.add(text);
         JPanel buttonPanel1 = new JPanel();
         buttonPanel1.setLayout(new GridLayout(4, 5));
         for (int i = 1; i <= 20; i++) {
@@ -78,9 +101,8 @@ public class DVMUI extends JFrame {
                     JButton b = (JButton) e.getSource();
                     String buttonText = b.getText();
                     int itemCode = find_string_index(drink, buttonText);
-                    int count = 1;
-                    //TODO : select amount logic, tmp 1 buy
-                    select_item(itemCode, 1);
+                    int count = Integer.parseInt(text.getText());
+                    select_item(itemCode, count);
                 }
             });
             buttonPanel1.add(button);
@@ -106,7 +128,8 @@ public class DVMUI extends JFrame {
         buttonPanel2.add(button2);
 
         //패널 2개를 contentPane에 추가
-        contentPane.add(buttonPanel1, BorderLayout.CENTER);
+        contentPane.add(buttonPanel1, BorderLayout.NORTH);
+        contentPane.add(panel, BorderLayout.CENTER);
         contentPane.add(buttonPanel2, BorderLayout.SOUTH);
 
         //새로운 contentPane으로 설정
@@ -123,7 +146,6 @@ public class DVMUI extends JFrame {
      * @param status - 1 ~ 20 : drink status
      */
     private void prepay_UI(int status) {
-        //TODO : set drink string using status
         Container contentPane = getContentPane();
         contentPane.removeAll();
         contentPane.setLayout(new GridLayout(2, 1));
@@ -263,11 +285,15 @@ public class DVMUI extends JFrame {
         contentPane.setLayout(new BorderLayout());
 
         JPanel panel = new JPanel();
-        JLabel adminLabel = new JLabel(drink[tmp_item]);
+        panel.setLayout(new GridLayout(2, 1));
+        JLabel adminLabel = new JLabel(drink[tmp_item] + ", " + tmp_count + "개 구매를 완료했습니다.");
         panel.add(adminLabel);
+        JLabel subtitleLabel = new JLabel("자판기에서 꺼내가주세요");
+        panel.add(subtitleLabel);
+
         contentPane.add(panel, BorderLayout.NORTH);
         JPanel bottom = new JPanel();
-        JButton button = new JButton("예");
+        JButton button = new JButton("음료 선택 화면으로 돌아가기");
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -287,19 +313,23 @@ public class DVMUI extends JFrame {
     }
 
     private void complete_prepay_UI(int status) {
-        //TODO : implement
-        String[] str = {"1", "2", "3"};
-
+        /**
+         * str
+         * 선결제 가능하면 string[0] 코드 string[1] 팀명, x y string[2] 거리,
+         *
+         * string[3] : x좌표 / string[4] : y좌표  추가로 담아 보낼게여
+         */
+        String[] str = this.str;
 
         Container contentPane = getContentPane();
         contentPane.removeAll();
-        contentPane.setLayout(new GridLayout(1, 6));
+        contentPane.setLayout(new GridLayout(3, 2));
 
         JLabel title1 = new JLabel("선결제 완료");
-        JLabel body1 = new JLabel(str[0]);
-        JLabel body2 = new JLabel("가장 가까운 자판기에 가서 수령하세요.");
+        JLabel body1 = new JLabel("코드 : " + str[0]);
+        JLabel body2 = new JLabel("자판기 명");
         JLabel body3 = new JLabel(str[1]);
-        JLabel body4 = new JLabel(str[2]);
+        JLabel body4 = new JLabel("거리는 " + str[2] + " 좌표는 " + str[3] + ", " + str[4] + "입니다");
         JButton button = new JButton("확인");
         button.addActionListener(new ActionListener() {
             @Override
@@ -485,7 +515,9 @@ public class DVMUI extends JFrame {
             if (ret == 0) {
                 pay_UI(DEF);
             } else if (ret == 1) {
-                prepay_UI(item_code);
+                if (dvmController.request_stock_msg(tmp_item, tmp_count)) {
+                    prepay_UI(item_code);
+                }
             } else if (ret == 2) {
                 item_list_UI(ERROR);
             }
@@ -505,7 +537,7 @@ public class DVMUI extends JFrame {
         if (item_code > 0) {
             item_UI(item_code);
         } else {
-            item_list_UI(PAY);
+            item_list_UI(ERROR);
         }
     }
 
@@ -514,7 +546,7 @@ public class DVMUI extends JFrame {
      * 부족(둘다 동일함)
      *
      * @param card_id : card id in user input this->status -> PAY or PREPAY Check req b
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     TODO : require in 1-e sequence diagram
+     *                : require in 1-e sequence diagram
      */
     public void insert_card(int card_id) {
         int charge = price[tmp_item] * tmp_count;
@@ -525,13 +557,19 @@ public class DVMUI extends JFrame {
                 /**
                  * 다른 카드 입력 받는 창.
                  */
+                add_item(tmp_item, tmp_count);
                 pay_UI(ERROR);
             }
         } else if (status == PREPAY) {
             if (dvmController.send_card_num(card_id, charge)) {
-                str = dvmController.prepay_info(tmp_item, tmp_count);
-                complete_prepay_UI(tmp_item);
+                this.str = dvmController.prepay_info(tmp_item, tmp_count);
+                if (str[0].equals("0") == true) {
+                    dvmController.cancel_prepay(card_id, charge);
+                } else {
+                    complete_prepay_UI(tmp_item);
+                }
             } else {
+                add_item(tmp_item, tmp_count);
                 item_list_UI(ERROR);
             }
         }

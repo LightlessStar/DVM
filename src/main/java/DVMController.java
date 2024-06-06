@@ -2,7 +2,11 @@ import java.io.*;
 import java.net.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.json.JSONObject;
 //예제 파일 합치기
 import com.google.gson.Gson;
@@ -273,7 +277,20 @@ public class DVMController {
             ret_str[0] = "0";
             return ret_str;
         } else {
-            ret_str[0] = "";
+
+            // 랜덤 코드 생성기! 가능한 문자열의 글자
+            String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            StringBuilder sb = new StringBuilder();
+            // 랜덤 객체 생성
+            Random random = new Random();
+            // 주어진 길이만큼 반복하여 랜덤 문자열 생성
+            for (int i = 0; i < 10; i++) {
+                // characters 문자열에서 랜덤한 글자 선택하여 sb에 추가
+                int randomIndex = random.nextInt(characters.length());
+                sb.append(characters.charAt(randomIndex));
+            }
+
+            ret_str[0] = sb.toString();
             ret_str[1] = dst_dvm_id;
             ret_str[2] = Double.toString(min_distance);
             prepayment_msg_JSON = new JSONObject()
@@ -286,9 +303,12 @@ public class DVMController {
                             .put("cert_code", ret_str[0])
                     );
 
-            req_prepayment_msg(prepayment_msg_JSON);
-
-            return ret_str;
+            if (req_prepayment_msg(prepayment_msg_JSON)) {
+                return ret_str;
+            } else {
+                ret_str[0] = "0";
+                return ret_str;
+            }
         }
         //선결제 불가능하면 return string[0] = "0" 으로 return
         //선결제 가능하면 string[0] 코드 string[1] 팀명, x y string[2] 거리
@@ -297,9 +317,9 @@ public class DVMController {
     /**
      * 다른 DVM에 prepay 보내는 함수
      */
-    private JSONObject req_prepayment_msg(JSONObject prepayment_msg_JSON) {
+    private boolean req_prepayment_msg(JSONObject prepayment_msg_JSON) {
+        AtomicBoolean possible_prepay = new AtomicBoolean(false);
         Thread clientThread = new Thread(() -> {
-
             try (Socket socket = new Socket(HOST, PORT)) {
                 PrintWriter writer;
                 BufferedReader reader;
@@ -317,13 +337,10 @@ public class DVMController {
                 JSONObject response_other_dvm = new JSONObject(reader.readLine());
                 System.out.println("Client : server res receive!!" + response_other_dvm);
 
+                //선결제 요청을 보내서, 선결제가 가능한지 여부 받아오기
+                //boolean possible_prepay = false;
+                possible_prepay.set(response_other_dvm.getJSONObject("msg_content").get("availability").equals("T") ? true : false);
 
-                //응답 받은 것을 저장
-                other_dvm_stock.put(response_other_dvm.get("src_id").toString(), response_other_dvm);
-                int[] coor = new int[2];
-                coor[0] = Integer.parseInt(response_other_dvm.getJSONObject("msg_content").get("coor_x").toString());
-                coor[1] = Integer.parseInt(response_other_dvm.getJSONObject("msg_content").get("coor_y").toString());
-                other_dvm_coord.put(response_other_dvm.get("src_id").toString(), coor);
 
                 try {
                     writer.close();
@@ -338,8 +355,18 @@ public class DVMController {
                 System.out.println("Client exception: " + e.getMessage());
                 e.printStackTrace();
             }
+
+
         });
         clientThread.start();
-        return null;
+
+        try {
+            clientThread.join();
+
+            return possible_prepay.get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

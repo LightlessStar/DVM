@@ -22,7 +22,7 @@ public class DVMController {
     //DCD에 없는 것들
     private Bank bank; //이거 왜 없어ㅓㅓㅓㅓㅓDCD에 넣어야 해
     private int[] price; //결제 금액 저장용 변수
-
+    private DVMStock dvmStock = new DVMStock();
 
     /**
      * 생성자. 기본 변수들 초기화
@@ -110,20 +110,20 @@ public class DVMController {
 
                     JSONObject other_dvm_msg = new JSONObject(reader.readLine());
                     System.out.println("Server : receive msg " + other_dvm_msg);
-                    System.out.println("Server : receive item_code, count" + other_dvm_msg.get());
 
+                    String res_item_code = other_dvm_msg.getJSONObject("msg_content").get("item_code").toString();
+                    String res_item_count = other_dvm_msg.getJSONObject("msg_content").get("count").toString();
 
                     JSONObject res_msg = new JSONObject();
                     res_msg.put("msg_type", "req_stock")
                             .put("src_id", "Team6")
                             .put("dst_id", "0")
                             .put("msg_content", new JSONObject()
-                                    .put("item_code", 20)
-                                    .put("count", 10)
+                                    .put("item_code", Integer.parseInt(res_item_code))
+                                    .put("count", dvmStock.check_stock(Integer.parseInt(res_item_code), Integer.parseInt(res_item_count)))
                                     .put("coor_x", coord_xy[0])
                                     .put("coor_y", coord_xy[1])
                             );
-
 
                     writer.println(res_msg);
 

@@ -65,7 +65,7 @@ public class DVMController {
                 );
 
         //broadcast일 경우 HOST, POST 바꾸거나 for 돌리기!
-        req_stock_msg(stock_msg_JSON, HOST, PORT);
+        req_stock_msg(stock_msg_JSON, HOST, CLIENT_PORT);
         return true;
     }
 
@@ -85,6 +85,7 @@ public class DVMController {
     }
 
     public boolean send_card_num(int card_id, int charge) {
+        System.out.println("send_card_num");
         if (bank.certify_pay(card_id, charge)) {
             return true;
         }
@@ -110,8 +111,9 @@ public class DVMController {
         return code_team_xy;
     }
 
-    private final int PORT = 30303;
-    private final String HOST = "localhost";
+    private final int SERVER_PORT = 30303;  //우리 컴퓨터에 열릴 포트
+    private final int CLIENT_PORT = 42424;  //남의 컴퓨터로 보낼 포트
+    private final String HOST = "localhost";    //남의 컴퓨터 주소!
     private final Gson gson = new Gson();
 
     /**
@@ -121,8 +123,8 @@ public class DVMController {
     public JSONObject res_stock_msg() {
         AtomicBoolean possible_prepay = new AtomicBoolean(false);
         Thread serverThread = new Thread(() -> {
-            try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-                System.out.println("Server is listening on PORT " + PORT);
+            try (ServerSocket serverSocket = new ServerSocket(SERVER_PORT)) {
+                System.out.println("Server is listening on PORT " + SERVER_PORT);
                 PrintWriter writer;
                 BufferedReader reader;
 
@@ -218,9 +220,9 @@ public class DVMController {
     /**
      * 다른 DVM에 stock msg 보내는 함수
      */
-    private JSONObject req_stock_msg(JSONObject msg, String HOST, int PORT) { //broad cast 문제
+    private JSONObject req_stock_msg(JSONObject msg, String HOST, int CLIENT_PORT) { //broad cast 문제
         Thread clientThread = new Thread(() -> {
-            try (Socket socket = new Socket(HOST, PORT)) {
+            try (Socket socket = new Socket(HOST, CLIENT_PORT)) {
                 PrintWriter writer;
                 BufferedReader reader;
                 try {
@@ -349,7 +351,7 @@ public class DVMController {
     private boolean req_prepayment_msg(JSONObject prepayment_msg_JSON) {
         AtomicBoolean possible_prepay = new AtomicBoolean(false);
         Thread clientThread = new Thread(() -> {
-            try (Socket socket = new Socket(HOST, PORT)) {
+            try (Socket socket = new Socket(HOST, CLIENT_PORT)) {
                 PrintWriter writer;
                 BufferedReader reader;
                 try {

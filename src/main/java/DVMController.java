@@ -28,7 +28,7 @@ public class DVMController {
     private int[] price; //결제 금액 저장용 변수
 
     private HashMap<String, Integer> code_stock;
-    private DVMStock dvmStock = new DVMStock();
+    private DVMStock dvmStock;
     private int tmp_item;
     private int tmp_count;
 
@@ -48,6 +48,23 @@ public class DVMController {
         for (int i = 0; i < price.length; i++) {
             price[i] = 500;
         }
+        dvmStock = new DVMStock();
+    }
+
+    public DVMController(DVMStock dvmStock) {
+        price = new int[20];
+        stock_msg_JSON = new JSONObject();
+        prepayment_msg_JSON = new JSONObject();
+        coord_xy = new int[]{27, 80};
+        other_dvm_coord = new HashMap<String, int[]>();
+        other_dvm_stock = new HashMap<String, Integer>();
+        verify_codes = new String[100];
+        code_stock = new HashMap<>();
+        bank = new Bank();
+        for (int i = 0; i < price.length; i++) {
+            price[i] = 500;
+        }
+        this.dvmStock = dvmStock;
     }
 
     /**
@@ -92,7 +109,7 @@ public class DVMController {
         return false;
     }
 
-    public boolean cancle_prepay(int card_id, int charge) {
+    public boolean cancel_prepay(int card_id, int charge) {
         if (bank.cancel_pay(card_id, charge)) {
             if (dvmStock.add_item(tmp_item, tmp_count)) {
                 tmp_item = 0;

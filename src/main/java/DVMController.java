@@ -64,17 +64,23 @@ public class DVMController {
         return true;
     }
 
-    public boolean send_code(String verify_code) {
-        for (int i = 0; i < verify_codes.length; i++) {
-            if (verify_code.equals(verify_codes[i])) {
-                return true;
-            }
+    public int send_code(String verify_code) {
+        if (code_stock.containsKey(verify_code)) {
+            Integer ret = code_stock.get(verify_code);
+            code_stock.remove(verify_code);
+            return ret;
+        } else {
+            return 0;
         }
-        return false;
+//        if (this.verify_code.equals(verify_code)) {
+//            return true;
+//        } else {
+//            return false;
+//        }
     }
 
-    public boolean send_card_num(int card_id) {
-        if (bank.certify_pay(card_id, 0)) {
+    public boolean send_card_num(int card_id, int charge) {
+        if (bank.certify_pay(card_id, charge)) {
             return true;
         }
         return false;
@@ -237,7 +243,7 @@ public class DVMController {
     /**
      * 1-e 선결제 -> item, count
      */
-    private String[] prepay_info(int item, int count) {
+    public String[] prepay_info(int item, int count) {
         //item 보유 중이고, 가장 거리가 가까운 dvm id 선별
         //충분한 item 있는 거만 뽑아서 따로 배열 만듦.
         HashMap<String, Integer> item_owner_so_many = new HashMap<>();

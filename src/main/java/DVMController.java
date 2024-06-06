@@ -6,6 +6,7 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.json.JSONObject;
 //예제 파일 합치기
@@ -27,7 +28,7 @@ public class DVMController {
     private Bank bank; //이거 왜 없어ㅓㅓㅓㅓㅓDCD에 넣어야 해
     private int[] price; //결제 금액 저장용 변수
 
-    private HashMap<String, Integer> code_stock; //<인증코드, item 코드 저장>
+    private static HashMap<String, Integer> code_stock; //<인증코드, item 코드 저장>
     private DVMStock dvmStock;
     private int tmp_item;
     private int tmp_count;
@@ -87,6 +88,8 @@ public class DVMController {
     }
 
     public int send_code(String verify_code) {
+        System.out.println("this is veri:" + verify_code);
+        System.out.println(code_stock);
         if (code_stock.containsKey(verify_code)) {
             Integer ret = code_stock.get(verify_code);
             code_stock.remove(verify_code);
@@ -165,7 +168,12 @@ public class DVMController {
                         res_msg = res_prepayment_msg(other_dvm_msg);
                         if (res_msg.getJSONObject("msg_content").get("availability").equals("T")) {
                             possible_prepay.set(true);
-                            code_stock.put(other_dvm_msg.getJSONObject("msg_content").get("cert_code").toString(), Integer.parseInt(other_dvm_msg.getJSONObject("msg_content").get("item_code").toString()));
+                            //System.out.println(other_dvm_msg.getJSONObject("msg_content").get("cert_code").toString());
+                            
+                            //int 하나에 구겨넣기 : item 개수 * 100 + item code
+                            int code = Integer.parseInt(other_dvm_msg.getJSONObject("msg_content").get("item_code").toString()) * 100 + Integer.parseInt(other_dvm_msg.getJSONObject("msg_content").get("item_code").toString());
+                            this.code_stock.put(other_dvm_msg.getJSONObject("msg_content").get("cert_code").toString(), code);
+                            //System.out.println("codestock : " + this.code_stock);
                         }
 
                     } else if (other_dvm_msg.get("msg_type").equals("req_stock")) {

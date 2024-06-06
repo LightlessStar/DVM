@@ -533,7 +533,8 @@ public class DVMUI extends JFrame {
 
     public void enter_code(String verify_code) {
         int item_code = dvmController.send_code(verify_code);
-
+        tmp_item = item_code;
+        tmp_count = item_code / 100;
         if (item_code > 0) {
             item_UI(item_code);
         } else {

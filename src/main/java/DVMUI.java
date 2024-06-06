@@ -326,7 +326,7 @@ public class DVMUI extends JFrame {
         contentPane.setLayout(new GridLayout(3, 2));
 
         JLabel title1 = new JLabel("선결제 완료");
-        JLabel body1 = new JLabel("코드 : str[0]");
+        JLabel body1 = new JLabel("코드 : " + str[0]);
         JLabel body2 = new JLabel("자판기 명");
         JLabel body3 = new JLabel(str[1]);
         JLabel body4 = new JLabel("거리는 " + str[2] + " 좌표는 " + str[3] + ", " + str[4] + "입니다");

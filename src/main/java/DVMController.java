@@ -7,13 +7,12 @@ import org.json.JSONObject;
 import com.google.gson.Gson;
 
 public class DVMController {
-    private String verify_code;
     private JSONObject stock_msg_JSON;
     private JSONObject prepayment_msg_JSON;
     private final int[] coord_xy; //주어진 우리 DVM 좌표
     private HashMap<String, int[]> other_dvm_coord;
     private HashMap<String, JSONObject> other_dvm_stock;
-
+    private String verify_codes[];// 새로 추가된 인증코드용 배열
     //Socket 통신 관련 변수는 메서드 안에서만 쓴다면 DCD에서 제외해도 될 듯
     private ServerSocket socket;
     private InputStream in;
@@ -28,13 +27,13 @@ public class DVMController {
      * 생성자. 기본 변수들 초기화
      */
     public DVMController() {
-        verify_code = "";
         price = new int[20];
         stock_msg_JSON = new JSONObject();
         prepayment_msg_JSON = new JSONObject();
         coord_xy = new int[]{27, 80};
         other_dvm_coord = new HashMap<String, int[]>();
         other_dvm_stock = new HashMap<String, JSONObject>();
+        verify_codes = new String[100];
         bank = new Bank();
         for (int i = 0; i < price.length; i++) {
             price[i] = 500;
@@ -61,15 +60,12 @@ public class DVMController {
     }
 
     public boolean send_code(String verify_code) {
-        if (this.verify_code.equals(verify_code)) {
-            return true;
-        } else {
-            return false;
+        for(int i=0; i<verify_codes.length; i++) {
+            if(verify_code.equals(verify_codes[i])){
+                return true;
+            }
         }
-    }
-
-    public boolean enter_code(String verify_code) {
-        return true;
+        return false;
     }
 
     public boolean send_card_num(int card_id) {
@@ -95,7 +91,7 @@ public class DVMController {
      * 우리 DVM 서버에서 지속적으로 Thread로 돌면서 stock_msg 통신 받아서 응답하는 함수
      * stock msg인지 prepay msg인지 JSON 항목으로 구분
      */
-    public JSONObject res_stock_msg() {
+    public JSONObject res_stock_msg(JSONObject) {
         Thread serverThread = new Thread(() -> {
             try (ServerSocket serverSocket = new ServerSocket(PORT)) {
                 System.out.println("Server is listening on PORT " + PORT);
@@ -205,8 +201,57 @@ public class DVMController {
                 writer.println(msg);
                 System.out.println("Client : send to server" + msg);
 
+
+                //Message response = service.receiveMessage(Message.class);
+                JSONObject msg_content = new JSONObject(response_other_dvm);
+                System.out.println(msg_content);
+                //msg_content = response.getJSONObject("msg_content");
+                other_dvm_stock.put(msg_content.get("src_id").toString(), msg_content);
+                int[] coor = new int[2];
+                coor[0] = msg_content.getJSONObject("msg_content").getInt("coor_x");
+                coor[1] = msg_content.getJSONObject("msg_content").getInt("coor_y");
+                other_dvm_coord.put(msg_content.get("src_id").toString(), coor);
+
+                try {
+                    writer.close();
+                    reader.close();
+                    socket.close();
+                    System.out.println("client fin");
+                } catch (Exception e) {
+                    throw new RuntimeException("Error closing streams", e);
+                }
+//            return msg_content;
+            } catch (Exception e) {
+                System.out.println("Client exception: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+        clientThread.start();
+        return null;
+    }
+    private JSONObject req_prepay_msg(JSONObject msg) {
+        Thread clientThread = new Thread(() -> {
+
+            try (Socket socket = new Socket("localhost", PORT)) {
+                PrintWriter writer;
+                BufferedReader reader;
+                try {
+                    writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"), true);
+                    reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
+                } catch (Exception e) {
+                    throw new RuntimeException("Error initializing streams", e);
+                }
+
+                // 서버로 메시지를 보내고 응답을 받습니다.
+                writer.println(msg);
+                System.out.println("i'm client : send to server" + msg);
+
+                String response_other_dvm = reader.readLine();
+                System.out.println("i'm client : server res receive!!" + response_other_dvm);
+
                 JSONObject response_other_dvm = new JSONObject(reader.readLine());
                 System.out.println("Client : server res receive!!" + response_other_dvm);
+
 
                 //응답 받은 것을 저장
                 other_dvm_stock.put(response_other_dvm.get("src_id").toString(), response_other_dvm);

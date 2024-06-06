@@ -5,7 +5,7 @@ public class Bank {
         bank_id = 0;
         card = new Card[20];
         for(int i = 0; i<card.length; i++){
-            card[i] = new Card(11111100+i,10000*i);
+            card[i] = new Card(1000+i,100000*i);
         }
     }
 

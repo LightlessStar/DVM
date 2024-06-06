@@ -85,6 +85,7 @@ public class DVMController {
     }
 
     public boolean send_card_num(int card_id, int charge) {
+        System.out.println("send_card_num");
         if (bank.certify_pay(card_id, charge)) {
             return true;
         }

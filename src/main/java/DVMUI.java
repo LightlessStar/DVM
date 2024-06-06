@@ -26,17 +26,14 @@ public class DVMUI extends JFrame {
             900, 1000
     };
     private int status;
-
-    //TODO:add dcd
-    private int tmp_item;
-    private int tmp_count;
-
     final private JFrame frame;
     private DVMStock dvmStock;
     private DVMController dvmController;
     private String[] str;
+    private int tmp_item;
+    private int tmp_count;
 
-    private static int findStringIndex(String[] array, String target) {
+    private static int find_string_index(String[] array, String target) {
         for (int i = 0; i < array.length; i++) {
             if (array[i].equals(target)) {
                 return i;
@@ -80,7 +77,7 @@ public class DVMUI extends JFrame {
                 public void actionPerformed(ActionEvent e) {
                     JButton b = (JButton) e.getSource();
                     String buttonText = b.getText();
-                    int itemCode = findStringIndex(drink, buttonText);
+                    int itemCode = find_string_index(drink, buttonText);
                     int count = 1;
                     //TODO : select amount logic, tmp 1 buy
                     select_item(itemCode, 1);
@@ -187,6 +184,7 @@ public class DVMUI extends JFrame {
             JTextField cardId = new JTextField();
             contentPane.add(cardId, BorderLayout.CENTER);
             JButton button = new JButton("버튼을 눌러 카드를 입력해주세요");
+            this.status = PAY;
             button.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -288,8 +286,10 @@ public class DVMUI extends JFrame {
 
     private void complete_prepay_UI(int status) {
         //TODO : implement
+        //TODO : use code_and_loc
         String[] str = {"1", "2", "3"};
 
+//    str = dvmController.code_and_loc();
         Container contentPane = getContentPane();
         contentPane.removeAll();
         contentPane.setLayout(new GridLayout(1, 6));
@@ -430,7 +430,7 @@ public class DVMUI extends JFrame {
                     String numberText = numberInput.getText();
 
                     //TODO : 에러 처리, integer이 아닌 경우
-                    add_item(findStringIndex(drink, selectedChoice), Integer.parseInt(numberText));
+                    add_item(find_string_index(drink, selectedChoice), Integer.parseInt(numberText));
                 }
             });
             bottom.add(button);
@@ -513,7 +513,7 @@ public class DVMUI extends JFrame {
      * 부족(둘다 동일함)
      *
      * @param card_id : card id in user input this->status -> PAY or PREPAY Check req b
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           TODO : require in 1-e sequence diagram
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        TODO : require in 1-e sequence diagram
      */
     public void insert_card(int card_id) {
         int charge = price[tmp_item] * tmp_count;
@@ -543,6 +543,7 @@ public class DVMUI extends JFrame {
         int[] item;
 
         item = dvmStock.check_stock_all();
+
         check_stock_UI(this.status, item);
     }
 

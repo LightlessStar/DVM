@@ -55,6 +55,16 @@ public class DVMUI extends JFrame {
         frame.setVisible(true); // 화면에 프레임 출력
     }
 
+    public DVMUI(DVMStock dvmStock) {
+        this.dvmStock = dvmStock;
+        this.dvmController = new DVMController();
+        frame = new JFrame("DVM TEAM6");
+        frame.setSize(600, 300);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        item_list_UI(DEF);
+        frame.setVisible(true); // 화면에 프레임 출력
+    }
+
     public DVMUI() {
         this.dvmStock = new DVMStock();
         this.dvmController = new DVMController();
@@ -303,18 +313,23 @@ public class DVMUI extends JFrame {
     }
 
     private void complete_prepay_UI(int status) {
-        //TODO : implement
+        /**
+         * str
+         * 선결제 가능하면 string[0] 코드 string[1] 팀명, x y string[2] 거리,
+         *
+         * string[3] : x좌표 / string[4] : y좌표  추가로 담아 보낼게여
+         */
         String[] str = this.str;
 
         Container contentPane = getContentPane();
         contentPane.removeAll();
-        contentPane.setLayout(new GridLayout(1, 6));
+        contentPane.setLayout(new GridLayout(3, 2));
 
         JLabel title1 = new JLabel("선결제 완료");
-        JLabel body1 = new JLabel(str[0]);
-        JLabel body2 = new JLabel("가장 가까운 자판기에 가서 수령하세요.");
+        JLabel body1 = new JLabel("코드 : str[0]");
+        JLabel body2 = new JLabel("자판기 명");
         JLabel body3 = new JLabel(str[1]);
-        JLabel body4 = new JLabel(str[2]);
+        JLabel body4 = new JLabel("거리는 " + str[2] + " 좌표는 " + str[3] + ", " + str[4] + "입니다");
         JButton button = new JButton("확인");
         button.addActionListener(new ActionListener() {
             @Override
@@ -548,7 +563,11 @@ public class DVMUI extends JFrame {
         } else if (status == PREPAY) {
             if (dvmController.send_card_num(card_id, charge)) {
                 this.str = dvmController.prepay_info(tmp_item, tmp_count);
-                complete_prepay_UI(tmp_item);
+                if (str[0].equals("0") == true) {
+                    dvmController.cancel_prepay(card_id, charge);
+                } else {
+                    complete_prepay_UI(tmp_item);
+                }
             } else {
                 add_item(tmp_item, tmp_count);
                 item_list_UI(ERROR);

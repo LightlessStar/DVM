@@ -13,7 +13,7 @@ public class Main {
 
         server_dvmController.res_stock_msg();
         cli_dvmController.request_stock_msg(20, 4);
-        cli2_dvmController.request_stock_msg(3, 5);
+        cli2_dvmController.prepay_info(3, 5);
 ////        cli_dvmController.request_stock_msg(3, 6);
 ////        cli_dvmController.request_stock_msg(3, 7);
 

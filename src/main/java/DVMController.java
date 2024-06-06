@@ -27,7 +27,7 @@ public class DVMController {
     private Bank bank; //이거 왜 없어ㅓㅓㅓㅓㅓDCD에 넣어야 해
     private int[] price; //결제 금액 저장용 변수
 
-    private HashMap<String, Integer> code_stock;
+    private HashMap<String, Integer> code_stock; //<인증코드, item 코드 저장>
     private DVMStock dvmStock = new DVMStock();
     private int tmp_item;
     private int tmp_count;
@@ -119,6 +119,7 @@ public class DVMController {
      * stock msg인지 prepay msg인지 JSON 항목으로 구분
      */
     public JSONObject res_stock_msg() {
+        AtomicBoolean possible_prepay = new AtomicBoolean(false);
         Thread serverThread = new Thread(() -> {
             try (ServerSocket serverSocket = new ServerSocket(PORT)) {
                 System.out.println("Server is listening on PORT " + PORT);
@@ -141,7 +142,12 @@ public class DVMController {
 
                     //prepayment 메시지일 경우, 함수로 던져줌.
                     if (other_dvm_msg.get("msg_type").equals("req_prepay")) {
+                        //만약 prepay true인 경우, verify code 저장하고
                         res_msg = res_prepayment_msg(other_dvm_msg);
+                        if (res_msg.getJSONObject("msg_content").get("availability").equals("T")) {
+                            possible_prepay.set(true);
+                            code_stock.put(other_dvm_msg.getJSONObject("msg_content").get("cert_code").toString(), Integer.parseInt(other_dvm_msg.getJSONObject("msg_content").get("item_code").toString()));
+                        }
 
                     } else if (other_dvm_msg.get("msg_type").equals("req_stock")) {
                         String res_item_code = other_dvm_msg.getJSONObject("msg_content").get("item_code").toString();

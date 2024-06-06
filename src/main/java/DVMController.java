@@ -39,7 +39,7 @@ public class DVMController {
         price = new int[20];
         stock_msg_JSON = new JSONObject();
         prepayment_msg_JSON = new JSONObject();
-        coord_xy = new int[]{27, 80};
+        coord_xy = new int[]{1, 1};
         other_dvm_coord = new HashMap<String, int[]>();
         other_dvm_stock = new HashMap<String, Integer>();
         verify_codes = new String[100];
@@ -55,7 +55,7 @@ public class DVMController {
         price = new int[20];
         stock_msg_JSON = new JSONObject();
         prepayment_msg_JSON = new JSONObject();
-        coord_xy = new int[]{27, 80};
+        coord_xy = new int[]{1, 1};
         other_dvm_coord = new HashMap<String, int[]>();
         other_dvm_stock = new HashMap<String, Integer>();
         verify_codes = new String[100];
@@ -74,7 +74,7 @@ public class DVMController {
     public boolean request_stock_msg(int item_code, int count) {
         stock_msg_JSON = new JSONObject()
                 .put("msg_type", "req_stock")
-                .put("src_id", "Team6")
+                .put("src_id", "Team0")
                 .put("dst_id", "0")
                 .put("msg_content", new JSONObject()
                         .put("item_code", item_code)
@@ -87,6 +87,8 @@ public class DVMController {
     }
 
     public int send_code(String verify_code) {
+        System.out.println("this is veri:" + verify_code);
+        System.out.println(code_stock);
         if (code_stock.containsKey(verify_code)) {
             Integer ret = code_stock.get(verify_code);
             code_stock.remove(verify_code);
@@ -128,8 +130,8 @@ public class DVMController {
         return code_team_xy;
     }
 
-    private final int SERVER_PORT = 30303;  //우리 컴퓨터에 열릴 포트
-    private final int CLIENT_PORT = 42424;  //남의 컴퓨터로 보낼 포트
+    private final int SERVER_PORT = 42424;  //우리 컴퓨터에 열릴 포트
+    private final int CLIENT_PORT = 30303;  //남의 컴퓨터로 보낼 포트
     private final String HOST = "localhost";    //남의 컴퓨터 주소!
     private final Gson gson = new Gson();
 
@@ -167,7 +169,7 @@ public class DVMController {
                         int[] our_item_counts = dvmStock.check_stock_all();
 
                         res_msg.put("msg_type", "resp_stock")
-                                .put("src_id", "Team6")
+                                .put("src_id", "Team0")
                                 .put("dst_id", "0")
                                 .put("msg_content", new JSONObject()
                                         .put("item_code", Integer.parseInt(res_item_code))
@@ -216,7 +218,7 @@ public class DVMController {
 
         JSONObject res_msg = new JSONObject();
         res_msg.put("msg_type", "resp_prepay")
-                .put("src_id", "Team6")
+                .put("src_id", "Team0")
                 .put("dst_id", other_dvm_msg.get("src_id"))
                 .put("msg_content", new JSONObject()
                         .put("item_code", res_item_code)
@@ -342,7 +344,7 @@ public class DVMController {
             ret_str[2] = Double.toString(min_distance);
             prepayment_msg_JSON = new JSONObject()
                     .put("msg_type", "req_prepay")
-                    .put("src_id", "Team6")
+                    .put("src_id", "Team0")
                     .put("dst_id", dst_dvm_id)
                     .put("msg_content", new JSONObject()
                             .put("item_code", item)

@@ -7,12 +7,15 @@ import org.json.JSONObject;
 import com.google.gson.Gson;
 
 public class DVMController {
+
     private String verify_code;
     private JSONObject stock_msg_JSON;
     private JSONObject prepayment_msg_JSON;
     private final int[] coord_xy; //주어진 우리 DVM 좌표
     private HashMap<String, int[]> other_dvm_coord;
+
     private HashMap<String, JSONObject> other_dvm_stock;
+
 
     //Socket 통신 관련 변수는 메서드 안에서만 쓴다면 DCD에서 제외해도 될 듯
     private ServerSocket socket;
@@ -23,6 +26,10 @@ public class DVMController {
     private Bank bank; //이거 왜 없어ㅓㅓㅓㅓㅓDCD에 넣어야 해
     private int[] price; //결제 금액 저장용 변수
 
+    private HashMap<String, int> code_stock;
+    private DVMStock dvmStock;
+    private int tmp_item;
+    private int tmp_count;
 
     /**
      * 생성자. 기본 변수들 초기화
@@ -34,6 +41,7 @@ public class DVMController {
         prepayment_msg_JSON = new JSONObject();
         coord_xy = new int[]{27, 80};
         other_dvm_coord = new HashMap<String, int[]>();
+        //other_dvm_stock : String - code / JSONObject - req
         other_dvm_stock = new HashMap<String, JSONObject>();
         bank = new Bank();
         for (int i = 0; i < price.length; i++) {
@@ -58,23 +66,50 @@ public class DVMController {
         return true;
     }
 
-    public boolean send_code(String verify_code) {
-        if (this.verify_code.equals(verify_code)) {
-            return true;
+    public int send_code(String verify_code) {
+        if (code_stock.containsKey(verify_code)) {
+            int ret = code_stock.get(verify_code);
+            code_stock.remove(verify_code);
+            return ret;
         } else {
-            return false;
+            return 0;
         }
+//        if (this.verify_code.equals(verify_code)) {
+//            return true;
+//        } else {
+//            return false;
+//        }
     }
 
     public boolean enter_code(String verify_code) {
         return true;
     }
 
-    public boolean send_card_num(int card_id) {
-        if (bank.certify_pay(card_id, 0)) {
+    public boolean send_card_num(int card_id, int charge) {
+        if (bank.certify_pay(card_id, charge)) {
             return true;
         }
         return false;
+    }
+
+    public String[] prepay_info(int item, int count) {
+        //TODO : req_prepayment_msg() 구현 필요
+        //TODO : ret string 구현 필요.
+        JSONObject prepayment_msg_JSON = new JSONObject();
+        this.tmp_item = item;
+        this.tmp_count = count;
+        String[] ret;
+        return ret;
+    }
+
+    public boolean cancle_prepay(int card_id, int charge) {
+        if (bank.cancel_pay(card_id, charge)) {
+            if (dvmStock.add_item(tmp_item, tmp_count)) {
+                tmp_item = 0;
+                tmp_count = 0;
+                return true;
+            }
+        }
     }
 
     /**

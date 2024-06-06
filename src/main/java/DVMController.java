@@ -273,6 +273,7 @@ public class DVMController {
         }
 
         //가장 거리 가까운 거 dvm 뽑기
+        String[] ret_str = new String[5];
         String dst_dvm_id = "";
         double min_distance = -1;
         for (Map.Entry<String, int[]> entry_coord : other_dvm_coord.entrySet()) {
@@ -288,15 +289,19 @@ public class DVMController {
                     if (min_distance == -1) {
                         min_distance = distance;
                         dst_dvm_id = entry_coord.getKey();
+                        ret_str[3] = Integer.toString(coord[0]);
+                        ret_str[4] = Integer.toString(coord[1]);
                     } else if (min_distance > distance) {
                         min_distance = distance;
                         dst_dvm_id = entry_coord.getKey();
+                        ret_str[3] = Integer.toString(coord[0]);
+                        ret_str[4] = Integer.toString(coord[1]);
                     }
                 }
             }
         }
 
-        String[] ret_str = new String[3];
+
         //min_distance가 -1이면 선결제 불가능
         if (min_distance == -1) {
             ret_str[0] = "0";

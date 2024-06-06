@@ -7,21 +7,28 @@ import com.google.gson.Gson;
 
 public class DVMController {
     private String verify_code;
-    private int[] price; //결제 금액 저장용 변수
     private JSONObject stock_msg_JSON;
     private JSONObject prepayment_msg_JSON;
     private final int[] coord_xy; //주어진 우리 DVM 좌표
     private HashMap<String, int[]> other_dvm_coord;
     private HashMap<String, JSONObject> other_dvm_stock;
-    private Socket socket;
+
+    //Socket 통신 관련 변수는 메서드 안에서만 쓴다면 DCD에서 제외해도 될 듯
+    private ServerSocket socket;
     private InputStream in;
     private OutputStream out;
-    private Bank bank; //이거 왜 없어ㅓㅓㅓㅓㅓDCD에 넣어야 해
 
+    //DCD에 없는 것들
+    private Bank bank; //이거 왜 없어ㅓㅓㅓㅓㅓDCD에 넣어야 해
+    private int[] price; //결제 금액 저장용 변수
+
+
+    /**생성자. 기본 변수들 초기화*/
     public DVMController() {
         verify_code = "";
         price = new int[20];
         stock_msg_JSON = new JSONObject();
+        prepayment_msg_JSON = new JSONObject();
         coord_xy = new int[] {27,80};
         other_dvm_coord = new HashMap<String, int[]>();
         other_dvm_stock = new HashMap<String, JSONObject>();
@@ -30,23 +37,40 @@ public class DVMController {
             price[i] = 500;
         }
     }
+
+    /**1-b select item DVMUI가 호출하는 함수
+     * stock_msg_JSON 만들어서 브로드캐스팅으로 전송한다.*/
     public boolean request_stock_msg(int item_code, int count){
 
-        JSONObject item_JSON = new JSONObject();
-        stock_msg_JSON.put("msg_type","req_stock");
-        stock_msg_JSON.put("src_id","Team6");
-        stock_msg_JSON.put("dst_id","0");
-        item_JSON.put("item_code",item_code);
-        item_JSON.put("count",count);
-        stock_msg_JSON.put("msg_content", item_JSON);
-        JSONObject temp = new JSONObject();
-        temp = stock_msg_JSON.getJSONObject("msg_content");
+//        JSONObject item_JSON = new JSONObject();
+//        stock_msg_JSON.put("msg_type","req_stock");
+//        stock_msg_JSON.put("src_id","Team6");
+//        stock_msg_JSON.put("dst_id","0");
+//        item_JSON.put("item_code",item_code);
+//        item_JSON.put("count",count);
+//        stock_msg_JSON.put("msg_content", item_JSON);
+//        JSONObject temp = new JSONObject();
+//        temp = stock_msg_JSON.getJSONObject("msg_content");
+        stock_msg_JSON = new JSONObject()
+                .put("msg_type", "req_stock")
+                .put("src_id", "Team6")
+                .put("dst_id", "0")
+                .put("msg_content", new JSONObject()
+                        .put("item_code", item_code)
+                        .put("count", count)
+                );
+
+
         req_stock_msg(stock_msg_JSON);
         return true;
     }
     public boolean send_code(String verify_code){
-
-        return true;
+        if (this.verify_code.equals(verify_code)) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
     public boolean enter_code(String verify_code) {
         return true;
@@ -60,117 +84,11 @@ public class DVMController {
     }
 
     private final int PORT = 30303;
-
-//    public void runServer() {
-//        Thread serverThread = new Thread(() -> {
-//        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-//            System.out.println("start server");
-//
-//            // 클라이언트로부터 연결을 대기하고, 연결되면 소켓을 생성합니다.
-//            Socket clientSocket = serverSocket.accept();
-//            System.out.println("connect client");
-//
-//            // 클라이언트로부터 받은 데이터를 읽어서 화면에 출력합니다.
-//            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-//            String line;
-//            while ((line = in.readLine()) != null) {
-//                System.out.println("client msg: " + line);
-//
-//                // JSON 형식의 문자열을 JSONObject로 변환합니다.
-//                JSONObject receivedJson = new JSONObject(line);
-//
-//                // JSONObject에서 원하는 데이터를 추출합니다.
-//                String name = receivedJson.getString("name");
-//                int age = receivedJson.getInt("age");
-//
-//                System.out.println("name: " + name);
-//                System.out.println("age: " + age);
-//            }
-//
-//            // 클라이언트와의 연결을 종료합니다.
-//            clientSocket.close();
-//            System.out.println("client connect finish");
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        });
-//        serverThread.start();
-//    }
-//
-//    public void runClient() {
-//        Thread clientThread = new Thread(() -> {
-//            try (Socket socket = new Socket("localhost", PORT)) {
-//                System.out.println("connected server");
-//
-//                // 서버로 보낼 JSON 데이터를 생성합니다.
-//                JSONObject jsonToSend = new JSONObject();
-//                jsonToSend.put("name", "John Doe");
-//                jsonToSend.put("age", 30);
-//
-//                // 서버로 데이터를 전송합니다.
-//                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-//                out.println(jsonToSend.toString());
-//
-//                // 서버에서 받은 응답을 읽어서 화면에 출력합니다.
-//                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//                String response = in.readLine();
-//                System.out.println("response from server: " + response);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        });
-//        clientThread.start();
-//    }
-
-
-
-//    public class JsonSocketServiceImpl {
-//        private Socket socket;
-//
-//
-//        public JsonSocketServiceImpl(Socket socket) {
-//            this.socket = socket;
-//        }
-//
-//        public void start() {
-//            try {
-//                this.writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"), true);
-//                this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
-//            } catch (Exception e) {
-//                throw new RuntimeException("Error initializing streams", e);
-//            }
-//        }
-//
-//        public void stop() {
-//            try {
-//                writer.close();
-//                reader.close();
-//                socket.close();
-//            } catch (Exception e) {
-//                throw new RuntimeException("Error closing streams", e);
-//            }
-//        }
-//
-//
-//        public void sendMessage(Object message) {
-//            writer.println(gson.toJson(message));
-//        }
-//
-//
-//        public <T> T receiveMessage(Class<T> clazz) {
-//            try {
-//                return gson.fromJson(reader.readLine(), clazz);
-//            } catch (Exception e) {
-//                throw new RuntimeException("Error receiving message", e);
-//            }
-//        }
-//    }
-
-
     private PrintWriter writer;
     private BufferedReader reader;
     private final Gson gson = new Gson();
 
+    /**우리 DVM 서버에서 지속적으로 Thread로 돌면서 통신 받아서 응답하는 함수 */
     public JSONObject res_stock_msg(){
         Thread serverThread = new Thread(() -> {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
@@ -202,13 +120,14 @@ public class DVMController {
                 writer.println(res_msg);
 
 
-//                try {
-//                    writer.close();
-//                    reader.close();
-//                    clientSocket.close();
-//                } catch (Exception e) {
-//                    throw new RuntimeException("Error closing streams", e);
-//                }
+                try {
+                    writer.close();
+                    reader.close();
+                    clientSocket.close();
+                    System.out.println("server end");
+                } catch (Exception e) {
+                    throw new RuntimeException("Error closing streams", e);
+                }
             }
         } catch (Exception e) {
             System.out.println("Server exception: " + e.getMessage());
@@ -218,6 +137,8 @@ public class DVMController {
         serverThread.start();
         return null;
     }
+    
+    /**다른 DVM에 msg 보내는 함수 */
     private JSONObject req_stock_msg(JSONObject msg){
         Thread clientThread = new Thread(() -> {
 

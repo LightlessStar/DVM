@@ -55,6 +55,16 @@ public class DVMUI extends JFrame {
         frame.setVisible(true); // 화면에 프레임 출력
     }
 
+    public DVMUI(DVMStock dvmStock) {
+        this.dvmStock = dvmStock;
+        this.dvmController = new DVMController();
+        frame = new JFrame("DVM TEAM6");
+        frame.setSize(600, 300);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        item_list_UI(DEF);
+        frame.setVisible(true); // 화면에 프레임 출력
+    }
+
     public DVMUI() {
         this.dvmStock = new DVMStock();
         this.dvmController = new DVMController();

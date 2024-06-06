@@ -52,7 +52,7 @@ public class DVMController {
                 .put("dst_id", "0")
                 .put("msg_content", new JSONObject()
                         .put("item_code", item_code)
-                        .put("count", count)
+                        .put("item_num", count)
                 );
         req_stock_msg(stock_msg_JSON);
         return true;
@@ -86,10 +86,12 @@ public class DVMController {
     }
 
     private final int PORT = 30303;
+    private final String HOST = "localhost";
     private final Gson gson = new Gson();
 
     /**
      * 우리 DVM 서버에서 지속적으로 Thread로 돌면서 stock_msg 통신 받아서 응답하는 함수
+     * stock msg인지 prepay msg인지 JSON 항목으로 구분
      */
     public JSONObject res_stock_msg() {
         Thread serverThread = new Thread(() -> {
@@ -110,32 +112,40 @@ public class DVMController {
 
                     JSONObject other_dvm_msg = new JSONObject(reader.readLine());
                     System.out.println("Server : receive msg " + other_dvm_msg);
-
-                    String res_item_code = other_dvm_msg.getJSONObject("msg_content").get("item_code").toString();
-                    String res_item_count = other_dvm_msg.getJSONObject("msg_content").get("count").toString();
-
                     JSONObject res_msg = new JSONObject();
-                    res_msg.put("msg_type", "req_stock")
-                            .put("src_id", "Team6")
-                            .put("dst_id", "0")
-                            .put("msg_content", new JSONObject()
-                                    .put("item_code", Integer.parseInt(res_item_code))
-                                    .put("count", dvmStock.check_stock(Integer.parseInt(res_item_code), Integer.parseInt(res_item_count)))
-                                    .put("coor_x", coord_xy[0])
-                                    .put("coor_y", coord_xy[1])
-                            );
+
+                    //prepayment 메시지일 경우, 함수로 던져줌.
+                    if (other_dvm_msg.get("msg_type").equals("req_prepay")) {
+                        res_msg = res_prepayment_msg(other_dvm_msg);
+
+                    } else if (other_dvm_msg.get("msg_type").equals("req_stock")) {
+                        String res_item_code = other_dvm_msg.getJSONObject("msg_content").get("item_code").toString();
+                        int[] our_item_counts = dvmStock.check_stock_all();
+
+                        res_msg.put("msg_type", "resp_stock")
+                                .put("src_id", "Team6")
+                                .put("dst_id", "0")
+                                .put("msg_content", new JSONObject()
+                                        .put("item_code", Integer.parseInt(res_item_code))
+                                        .put("item_num", our_item_counts[Integer.parseInt(res_item_code) - 1])
+                                        .put("coor_x", coord_xy[0])
+                                        .put("coor_y", coord_xy[1])
+                                );
+                    } else {
+                        continue;
+                    }
 
                     writer.println(res_msg);
-
 
                     try {
                         writer.close();
                         reader.close();
                         clientSocket.close();
-                        System.out.println("server end");
+                        //System.out.println("server end");
                     } catch (Exception e) {
                         throw new RuntimeException("Error closing streams", e);
                     }
+
                 }
             } catch (Exception e) {
                 System.out.println("Server exception: " + e.getMessage());
@@ -147,12 +157,40 @@ public class DVMController {
     }
 
     /**
+     * 다른 DVM의 선결제 요청에 대한 우리 DVM의 응답 | 선결제 가능할 경우 재고 감소
+     */
+    private JSONObject res_prepayment_msg(JSONObject other_dvm_msg) {
+        int res_item_code = Integer.parseInt(other_dvm_msg.getJSONObject("msg_content").get("item_code").toString());
+        int res_item_num = Integer.parseInt(other_dvm_msg.getJSONObject("msg_content").get("item_num").toString());
+        int[] our_item_counts = dvmStock.check_stock_all();
+
+        boolean possible_prepay = false;
+        if (our_item_counts[res_item_code - 1] >= res_item_num) {
+            dvmStock.check_stock(res_item_code, res_item_num);
+            possible_prepay = true;
+        }
+
+        JSONObject res_msg = new JSONObject();
+        res_msg.put("msg_type", "resp_prepay")
+                .put("src_id", "Team6")
+                .put("dst_id", other_dvm_msg.get("src_id"))
+                .put("msg_content", new JSONObject()
+                        .put("item_code", res_item_code)
+                        .put("item_num", our_item_counts[res_item_code - 1]) //[질문] 선결제 성공 했다면, 차감된 재고를 보내야 하는지, 차감되기 전 재고를 보내야 하는지?
+                        .put("availability", possible_prepay ? "T" : "F")
+                );
+
+        return res_msg;
+    }
+
+
+    /**
      * 다른 DVM에 stock msg 보내는 함수
      */
-    private JSONObject req_stock_msg(JSONObject msg) {
+    private JSONObject req_stock_msg(JSONObject msg) { //broad cast 문제
         Thread clientThread = new Thread(() -> {
 
-            try (Socket socket = new Socket("localhost", PORT)) {
+            try (Socket socket = new Socket(HOST, PORT)) {
                 PrintWriter writer;
                 BufferedReader reader;
                 try {

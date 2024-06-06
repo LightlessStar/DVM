@@ -26,7 +26,11 @@ public class DVMController {
     //DCD에 없는 것들
     private Bank bank; //이거 왜 없어ㅓㅓㅓㅓㅓDCD에 넣어야 해
     private int[] price; //결제 금액 저장용 변수
+
+    private HashMap<String, Integer> code_stock;
     private DVMStock dvmStock = new DVMStock();
+    private int tmp_item;
+    private int tmp_count;
 
     /**
      * 생성자. 기본 변수들 초기화
@@ -39,6 +43,7 @@ public class DVMController {
         other_dvm_coord = new HashMap<String, int[]>();
         other_dvm_stock = new HashMap<String, Integer>();
         verify_codes = new String[100];
+        code_stock = new HashMap<>();
         bank = new Bank();
         for (int i = 0; i < price.length; i++) {
             price[i] = 500;
@@ -82,6 +87,17 @@ public class DVMController {
     public boolean send_card_num(int card_id, int charge) {
         if (bank.certify_pay(card_id, charge)) {
             return true;
+        }
+        return false;
+    }
+
+    public boolean cancle_prepay(int card_id, int charge) {
+        if (bank.cancel_pay(card_id, charge)) {
+            if (dvmStock.add_item(tmp_item, tmp_count)) {
+                tmp_item = 0;
+                tmp_count = 0;
+                return true;
+            }
         }
         return false;
     }
@@ -154,6 +170,7 @@ public class DVMController {
                     } catch (Exception e) {
                         throw new RuntimeException("Error closing streams", e);
                     }
+
                 }
             } catch (Exception e) {
                 System.out.println("Server exception: " + e.getMessage());
@@ -361,8 +378,6 @@ public class DVMController {
                 System.out.println("Client exception: " + e.getMessage());
                 e.printStackTrace();
             }
-
-
         });
         clientThread.start();
 

@@ -54,7 +54,9 @@ public class DVMController {
                         .put("item_code", item_code)
                         .put("item_num", count)
                 );
-        req_stock_msg(stock_msg_JSON);
+
+        //broadcast일 경우 HOST, POST 바꾸거나 for 돌리기!
+        req_stock_msg(stock_msg_JSON, HOST, PORT);
         return true;
     }
 
@@ -187,9 +189,8 @@ public class DVMController {
     /**
      * 다른 DVM에 stock msg 보내는 함수
      */
-    private JSONObject req_stock_msg(JSONObject msg) { //broad cast 문제
+    private JSONObject req_stock_msg(JSONObject msg, String HOST, int PORT) { //broad cast 문제
         Thread clientThread = new Thread(() -> {
-
             try (Socket socket = new Socket(HOST, PORT)) {
                 PrintWriter writer;
                 BufferedReader reader;
@@ -202,21 +203,17 @@ public class DVMController {
 
                 // 서버로 메시지를 보내고 응답을 받습니다.
                 writer.println(msg);
-                System.out.println("i'm client : send to server" + msg);
+                System.out.println("Client : send to server" + msg);
 
-                String response_other_dvm = reader.readLine();
-                System.out.println("i'm client : server res receive!!" + response_other_dvm);
+                JSONObject response_other_dvm = new JSONObject(reader.readLine());
+                System.out.println("Client : server res receive!!" + response_other_dvm);
 
-
-                //Message response = service.receiveMessage(Message.class);
-                JSONObject msg_content = new JSONObject(response_other_dvm);
-                System.out.println(msg_content);
-                //msg_content = response.getJSONObject("msg_content");
-                other_dvm_stock.put(msg_content.get("src_id").toString(), msg_content);
+                //응답 받은 것을 저장
+                other_dvm_stock.put(response_other_dvm.get("src_id").toString(), response_other_dvm);
                 int[] coor = new int[2];
-                coor[0] = msg_content.getJSONObject("msg_content").getInt("coor_x");
-                coor[1] = msg_content.getJSONObject("msg_content").getInt("coor_y");
-                other_dvm_coord.put(msg_content.get("src_id").toString(), coor);
+                coor[0] = Integer.parseInt(response_other_dvm.getJSONObject("msg_content").get("coor_x").toString());
+                coor[1] = Integer.parseInt(response_other_dvm.getJSONObject("msg_content").get("coor_y").toString());
+                other_dvm_coord.put(response_other_dvm.get("src_id").toString(), coor);
 
                 try {
                     writer.close();

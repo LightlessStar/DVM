@@ -308,7 +308,7 @@ public class DVMUI extends JFrame {
 
         Container contentPane = getContentPane();
         contentPane.removeAll();
-        contentPane.setLayout(new GridLayout(1, 6));
+        contentPane.setLayout(new GridLayout(3, 2));
 
         JLabel title1 = new JLabel("선결제 완료");
         JLabel body1 = new JLabel(str[0]);

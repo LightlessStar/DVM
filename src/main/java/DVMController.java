@@ -148,7 +148,6 @@ public class DVMController {
                     } catch (Exception e) {
                         throw new RuntimeException("Error closing streams", e);
                     }
-
                 }
             } catch (Exception e) {
                 System.out.println("Server exception: " + e.getMessage());
@@ -233,6 +232,7 @@ public class DVMController {
         clientThread.start();
         return null;
     }
+
 
     /**
      * 1-e 선결제 -> item, count

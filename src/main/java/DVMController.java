@@ -7,13 +7,12 @@ import org.json.JSONObject;
 import com.google.gson.Gson;
 
 public class DVMController {
-    private String verify_code;
     private JSONObject stock_msg_JSON;
     private JSONObject prepayment_msg_JSON;
     private final int[] coord_xy; //주어진 우리 DVM 좌표
     private HashMap<String, int[]> other_dvm_coord;
     private HashMap<String, JSONObject> other_dvm_stock;
-
+    private String verify_codes[];// 새로 추가된 인증코드용 배열
     //Socket 통신 관련 변수는 메서드 안에서만 쓴다면 DCD에서 제외해도 될 듯
     private ServerSocket socket;
     private InputStream in;
@@ -28,13 +27,13 @@ public class DVMController {
      * 생성자. 기본 변수들 초기화
      */
     public DVMController() {
-        verify_code = "";
         price = new int[20];
         stock_msg_JSON = new JSONObject();
         prepayment_msg_JSON = new JSONObject();
         coord_xy = new int[]{27, 80};
         other_dvm_coord = new HashMap<String, int[]>();
         other_dvm_stock = new HashMap<String, JSONObject>();
+        verify_codes = new String[100];
         bank = new Bank();
         for (int i = 0; i < price.length; i++) {
             price[i] = 500;
@@ -59,15 +58,12 @@ public class DVMController {
     }
 
     public boolean send_code(String verify_code) {
-        if (this.verify_code.equals(verify_code)) {
-            return true;
-        } else {
-            return false;
+        for(int i=0; i<verify_codes.length; i++) {
+            if(verify_code.equals(verify_codes[i])){
+                return true;
+            }
         }
-    }
-
-    public boolean enter_code(String verify_code) {
-        return true;
+        return false;
     }
 
     public boolean send_card_num(int card_id) {

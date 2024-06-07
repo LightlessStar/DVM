@@ -101,11 +101,11 @@ public class DVMController {
                         .put("item_code", item_code)
                         .put("item_num", count)
                 );
-
         //broadcast일 경우 HOST, POST 바꾸거나 for 돌리기!
         for (Map.Entry<String, Integer> dvm : other_dvm.entrySet()) {
             req_stock_msg(stock_msg_JSON, dvm.getKey(), dvm.getValue());
         }
+
 
         System.out.println("thread 종료");
         ///////////////////////////////////////
@@ -267,7 +267,7 @@ public class DVMController {
                                 .put("src_id", "Team6")
                                 .put("dst_id", "0")
                                 .put("msg_content", new JSONObject()
-                                        .put("item_code", Integer.parseInt(res_item_code))
+                                        .put("item_code", res_item_code)
                                         .put("item_num", our_item_counts[Integer.parseInt(res_item_code) - 1])
                                         .put("coor_x", coord_xy[0])
                                         .put("coor_y", coord_xy[1])

@@ -12,6 +12,7 @@ public class DVMUI extends JFrame {
     final int DEF = 0;
     final int PAY = 100;
     final int PREPAY = 200;
+    final int NULLABLE = 300;
     final private String[] drink = {
             "없음", "콜라", "사이다",
             "녹차", "홍차", "밀크티", "탄산수",
@@ -86,7 +87,9 @@ public class DVMUI extends JFrame {
         if (status == ERROR) {
             title.setText("결제에 실패했습니다. 다시 확인해주세요");
         } else if (status == PREPAY) {
-            title.setText("좌표는 " + tmp_coord[1] + "입니다");
+            title.setText("좌표는 " + tmp_coord[1] + "입니다  x : " + tmp_coord[3] + ", y : " + tmp_coord[4] + "에 접근해주세요");
+        } else if (status == NULLABLE) {
+            title.setText("존재하는 음료 재고가 아예 없습니다. 다시 확인해주세요");
         }
         contentPane.add(title);
         JPanel panel = new JPanel();
@@ -529,13 +532,14 @@ public class DVMUI extends JFrame {
                  * request_stock_msg -> -1, 0, 1
                  */
                 this.tmp_coord = dvmController.request_stock_msg(tmp_item, tmp_count);
+
                 System.out.println(this.tmp_coord[0]);
                 System.out.println(this.tmp_coord[1]);
                 System.out.println(this.tmp_coord[2]);
                 if (tmp_coord[0].equals("1") == true) {
                     prepay_UI(item_code);
                 } else {
-
+                    item_list_UI(NULLABLE);
                 }
             } else if (ret == 2) {
                 item_list_UI(ERROR);

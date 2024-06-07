@@ -531,10 +531,7 @@ public class DVMUI extends JFrame {
              */
             this.tmp_coord = dvmController.request_stock_msg(tmp_item, tmp_count);
 
-            System.out.println(this.tmp_coord[0]);
-            System.out.println(this.tmp_coord[1]);
-            System.out.println(this.tmp_coord[2]);
-            if (tmp_coord[0].equals("1") == true) {
+            if (tmp_coord[0].equals("1")) {
                 prepay_UI(item_code);
             } else {
                 item_list_UI(NULLABLE);
@@ -586,7 +583,7 @@ public class DVMUI extends JFrame {
         } else if (status == PREPAY) {
             if (dvmController.send_card_num(card_id, charge)) {
                 this.str = dvmController.prepay_info(tmp_item, tmp_count);
-                if (str[0].equals("0") == true) {
+                if (str[0].equals("0")) {
                     dvmController.cancel_prepay(card_id, charge);
                     item_list_UI(ERROR);
                 } else {

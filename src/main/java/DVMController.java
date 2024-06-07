@@ -80,11 +80,17 @@ public class DVMController {
         this.dvmStock = dvmStock;
     }
 
+    private static String s1;
+    private static String s2;
+    private static String s3;
+
+    private static String[] ret_str_coord = new String[5];
+
     /**
      * 1-b select item DVMUI가 호출하는 함수
      * stock_msg_JSON 만들어서 브로드캐스팅으로 전송한다.
      */
-    public boolean request_stock_msg(int item_code, int count) {
+    public String[] request_stock_msg(int item_code, int count) {
         tmp_item = item_code;
         tmp_count = count;
         stock_msg_JSON = new JSONObject()
@@ -95,12 +101,73 @@ public class DVMController {
                         .put("item_code", String.format("%02d", item_code))
                         .put("item_num", Integer.toString(count))
                 );
-
         //broadcast일 경우 HOST, POST 바꾸거나 for 돌리기!
         for (Map.Entry<String, Integer> dvm : other_dvm.entrySet()) {
             req_stock_msg(stock_msg_JSON, dvm.getKey(), dvm.getValue());
         }
-        return true;
+
+
+        System.out.println("thread 종료");
+        ///////////////////////////////////////
+        //item 보유 중이고, 가장 거리가 가까운 dvm id 선별
+        //충분한 item 있는 거만 뽑아서 따로 배열 만듦.
+        HashMap<String, Integer> item_owner_so_many = new HashMap<>();
+        for (Map.Entry<String, Integer> entry : other_dvm_stock.entrySet()) {
+            if (entry.getValue() >= count) {
+                item_owner_so_many.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        //가장 거리 가까운 거 dvm 뽑기
+
+        String dst_dvm_id = "";
+        double min_distance = -1;
+        for (Map.Entry<String, int[]> entry_coord : other_dvm_coord.entrySet()) {
+            for (Map.Entry<String, Integer> entry_stock : item_owner_so_many.entrySet()) {
+                //좌표 저장된 것 중 충분한 item 많은 거 dvm만 탐색.
+                if (entry_coord.getKey().equals(entry_stock.getKey())) {
+                    //최단거리 계산
+                    int[] coord = entry_coord.getValue();
+                    int del_x = coord[0] - coord_xy[0];
+                    int del_y = coord[1] - coord_xy[1];
+                    double distance = Math.sqrt(del_x * del_x + del_y * del_y);
+
+                    if (min_distance == -1) {
+                        min_distance = distance;
+                        dst_dvm_id = entry_coord.getKey();
+                        this.ret_str_coord[3] = Integer.toString(coord[0]);
+                        this.ret_str_coord[4] = Integer.toString(coord[1]);
+                    } else if (min_distance > distance) {
+                        min_distance = distance;
+                        dst_dvm_id = entry_coord.getKey();
+                        this.ret_str_coord[3] = Integer.toString(coord[0]);
+                        this.ret_str_coord[4] = Integer.toString(coord[1]);
+                    }
+                }
+            }
+        }
+
+        if (min_distance == -1) {
+            this.ret_str_coord[0] = "0";
+        } else {
+            this.ret_str_coord[0] = "1";
+            this.ret_str_coord[1] = dst_dvm_id;
+            this.ret_str_coord[2] = Double.toString(min_distance);
+        }
+//        System.out.println(ret_str_coord[0]);
+//        System.out.println(ret_str_coord[1]);
+//        System.out.println(ret_str_coord[2]);
+        ///////////////////////////////////////
+
+
+//        ret_str_coord[0] = s1;
+//        ret_str_coord[1] = s2;
+//        ret_str_coord[2] = s3;
+        System.out.println(ret_str_coord[0]);
+        System.out.println(ret_str_coord[1]);
+        System.out.println(ret_str_coord[2]);
+
+        return this.ret_str_coord;
     }
 
     public int send_code(String verify_code) {
@@ -297,7 +364,6 @@ public class DVMController {
                 } catch (Exception e) {
                     throw new RuntimeException("Error closing streams", e);
                 }
-//            return msg_content;
             } catch (Exception e) {
                 System.out.println("Client exception: " + e.getMessage());
                 e.printStackTrace();

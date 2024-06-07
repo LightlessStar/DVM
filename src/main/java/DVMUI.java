@@ -566,6 +566,7 @@ public class DVMUI extends JFrame {
                 this.str = dvmController.prepay_info(tmp_item, tmp_count);
                 if (str[0].equals("0") == true) {
                     dvmController.cancel_prepay(card_id, charge);
+                    item_list_UI(ERROR);
                 } else {
                     complete_prepay_UI(tmp_item);
                 }

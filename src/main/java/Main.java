@@ -14,9 +14,9 @@ public class Main {
         DVMController cli_dvmController = new DVMController(dvmStock);
         DVMController cli2_dvmController = new DVMController(dvmStock);
 
-//        server_dvmController.res_stock_msg();
-//        cli_dvmController.request_stock_msg(20, 4);
-//        cli2_dvmController.prepay_info(3, 5);
+        server_dvmController.res_stock_msg();
+        cli_dvmController.request_stock_msg(20, 4);
+        cli2_dvmController.prepay_info(3, 5);
 ////        cli_dvmController.request_stock_msg(3, 6);
 ////        cli_dvmController.request_stock_msg(3, 7);
 

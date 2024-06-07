@@ -86,7 +86,7 @@ public class DVMUI extends JFrame {
         if (status == ERROR) {
             title.setText("결제에 실패했습니다. 다시 확인해주세요");
         } else if (status == PREPAY) {
-            title.setText("좌표는 " + temp[1] + "입니다");
+            title.setText("좌표는 " + tmp_coord[1] + "입니다");
         }
         contentPane.add(title);
         JPanel panel = new JPanel();

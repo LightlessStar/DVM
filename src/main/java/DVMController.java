@@ -202,9 +202,10 @@ public class DVMController {
                                 .put("msg_content", new JSONObject()
                                         .put("item_code", String.format("%02d", Integer.parseInt(res_item_code)))
                                         .put("item_num", Integer.toString(our_item_counts[Integer.parseInt(res_item_code) - 1]))
-                                        .put("coor_x", coord_xy[0])
-                                        .put("coor_y", coord_xy[1])
+                                        .put("coor_x", Integer.toString(coord_xy[0]))
+                                        .put("coor_y", Integer.toString(coord_xy[1]))
                                 );
+                        System.out.println(res_msg);
                     } else {
                         continue;
                     }
@@ -215,7 +216,7 @@ public class DVMController {
                         writer.close();
                         reader.close();
                         clientSocket.close();
-                        //System.out.println("server end");
+                        System.out.println("server end");
                     } catch (Exception e) {
                         throw new RuntimeException("Error closing streams", e);
                     }

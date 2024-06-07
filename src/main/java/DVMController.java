@@ -85,6 +85,7 @@ public class DVMController {
      * stock_msg_JSON 만들어서 브로드캐스팅으로 전송한다.
      */
     public boolean request_stock_msg(int item_code, int count) {
+        JSONObject stock_msg_JSON;
         tmp_item = item_code;
         tmp_count = count;
         stock_msg_JSON = new JSONObject()

@@ -376,9 +376,13 @@ public class DVMUI extends JFrame {
         contentPane.setLayout(new GridLayout(3, 1));
 
         // "관리자메뉴" 라벨 추가
-        JLabel adminLabel = new JLabel("재고 확인", JLabel.CENTER);
-        contentPane.add(adminLabel, BorderLayout.NORTH);
-
+        if(status==DEF) {
+            JLabel adminLabel = new JLabel("재고 확인", JLabel.CENTER);
+            contentPane.add(adminLabel, BorderLayout.NORTH);
+        }else{
+            JLabel adminLabel = new JLabel("재고가 추가되지 않았습니다. 다시해주세요.", JLabel.CENTER);
+            contentPane.add(adminLabel, BorderLayout.NORTH);
+        }
         JPanel stock = new JPanel();
         stock.setLayout(new GridLayout(4, 5));
         for (int i = 1; i <= 20; i++) {
@@ -628,12 +632,12 @@ public class DVMUI extends JFrame {
      */
     public void add_item(int item_code, int stock) {
         int[] item;
-        if (dvmStock.add_item(item_code, stock)) {
-            item = dvmStock.check_stock_all();
+        boolean add_bool = dvmStock.add_item(item_code,stock);
+        item = dvmStock.check_stock_all();
+        if (add_bool) {
             check_stock_UI(DEF, item);
         } else {
-            item = dvmStock.check_stock_all();
-            check_stock_UI(DEF, item);
+            check_stock_UI(ERROR, item);
         }
     }
 }

@@ -1,8 +1,37 @@
 import org.junit.jupiter.api.Test;
 
+import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 class MainTest {
+
+    public static Object genericInvokeMethod(Object obj, String methodName,
+                                             Object... params) {
+        int paramCount = params.length;
+        Method method;
+        Object requiredObj = null;
+        Class<?>[] classArray = new Class<?>[paramCount];
+        for (int i = 0; i < paramCount; i++) {
+            classArray[i] = params[i].getClass();
+        }
+        try {
+            method = obj.getClass().getDeclaredMethod(methodName, classArray);
+            method.setAccessible(true);
+            requiredObj = method.invoke(obj, params);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return requiredObj;
+    }
 
     @org.junit.jupiter.api.Test
     void viewItemCorrect() {
@@ -12,10 +41,19 @@ class MainTest {
     @Test
     void viewItemNotCorrect() {
 
+
     }
 
     @Test
-    void selectItemOfferUser() {}
+    void selectItemOfferUser() throws Exception {
+//        DVMUI test = mock(DVMUI.class);
+//        Method method = DVMUI.class.getDeclaredMethod("prepay_UI");
+//        method.setAccessible(true);
+//        method.invoke(test);
+//        test.select_item(1, 1);
+//
+//        verify(test, times(1)).prepay_UI(anyInt());
+    }
 
     @Test
     void selectItemOtherDVM() {
@@ -23,7 +61,8 @@ class MainTest {
     }
 
     @Test
-    void selectItemNotOffer() {}
+    void selectItemNotOffer() {
+    }
 
     @Test
     void payByVerificationCodeCorrect() {
@@ -102,7 +141,8 @@ class MainTest {
     }
 
     @Test
-    void resPrepayMsgReduceNotEnough() {}
+    void resPrepayMsgReduceNotEnough() {
+    }
 
 
     @Test

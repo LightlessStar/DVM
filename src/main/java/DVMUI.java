@@ -376,10 +376,10 @@ public class DVMUI extends JFrame {
         contentPane.setLayout(new GridLayout(3, 1));
 
         // "관리자메뉴" 라벨 추가
-        if(status==DEF) {
+        if (status == DEF) {
             JLabel adminLabel = new JLabel("재고 확인", JLabel.CENTER);
             contentPane.add(adminLabel, BorderLayout.NORTH);
-        }else{
+        } else {
             JLabel adminLabel = new JLabel("재고가 추가되지 않았습니다. 다시해주세요.", JLabel.CENTER);
             contentPane.add(adminLabel, BorderLayout.NORTH);
         }
@@ -584,8 +584,11 @@ public class DVMUI extends JFrame {
             if (dvmController.send_card_num(card_id, charge)) {
                 this.str = dvmController.prepay_info(tmp_item, tmp_count);
                 if (str[0].equals("0")) {
-                    dvmController.cancel_prepay(card_id, charge);
-                    item_list_UI(ERROR);
+                    if (dvmController.cancel_prepay(card_id, charge) == true) {
+                        item_list_UI(ERROR);
+                    } else {
+                        System.exit(1);
+                    }
                 } else {
                     complete_prepay_UI(tmp_item);
                 }
@@ -629,7 +632,7 @@ public class DVMUI extends JFrame {
      */
     public void add_item(int item_code, int stock) {
         int[] item;
-        boolean add_bool = dvmStock.add_item(item_code,stock);
+        boolean add_bool = dvmStock.add_item(item_code, stock);
         item = dvmStock.check_stock_all();
         if (add_bool) {
             check_stock_UI(DEF, item);

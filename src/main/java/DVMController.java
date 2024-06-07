@@ -84,7 +84,7 @@ public class DVMController {
      * 1-b select item DVMUI가 호출하는 함수
      * stock_msg_JSON 만들어서 브로드캐스팅으로 전송한다.
      */
-    public boolean request_stock_msg(int item_code, int count) {
+    public String[] request_stock_msg(int item_code, int count) {
         tmp_item = item_code;
         tmp_count = count;
         stock_msg_JSON = new JSONObject()
@@ -100,7 +100,7 @@ public class DVMController {
         for (Map.Entry<String, Integer> dvm : other_dvm.entrySet()) {
             req_stock_msg(stock_msg_JSON, dvm.getKey(), dvm.getValue());
         }
-        return true;
+        return ret_str_coord;
     }
 
     public int send_code(String verify_code) {
@@ -257,6 +257,7 @@ public class DVMController {
         return res_msg;
     }
 
+    private static String[] ret_str_coord = new String[5];
 
     /**
      * 다른 DVM에 stock msg 보내는 함수
@@ -289,6 +290,68 @@ public class DVMController {
                 coor[1] = Integer.parseInt(response_other_dvm.getJSONObject("msg_content").get("coor_y").toString());
                 other_dvm_coord.put(response_other_dvm.get("src_id").toString(), coor);
 
+                ///////////////////////////////////////
+                int count = Integer.parseInt(msg.getJSONObject("msg_content").get("item_num").toString());
+                //item 보유 중이고, 가장 거리가 가까운 dvm id 선별
+                //충분한 item 있는 거만 뽑아서 따로 배열 만듦.
+                HashMap<String, Integer> item_owner_so_many = new HashMap<>();
+                for (Map.Entry<String, Integer> entry : other_dvm_stock.entrySet()) {
+                    if (entry.getValue() >= count) {
+                        item_owner_so_many.put(entry.getKey(), entry.getValue());
+                    }
+                }
+
+                //가장 거리 가까운 거 dvm 뽑기
+
+                String dst_dvm_id = "";
+                double min_distance = -1;
+                for (Map.Entry<String, int[]> entry_coord : other_dvm_coord.entrySet()) {
+                    for (Map.Entry<String, Integer> entry_stock : item_owner_so_many.entrySet()) {
+                        //좌표 저장된 것 중 충분한 item 많은 거 dvm만 탐색.
+                        if (entry_coord.getKey().equals(entry_stock.getKey())) {
+                            //최단거리 계산
+                            int[] coord = entry_coord.getValue();
+                            int del_x = coord[0] - coord_xy[0];
+                            int del_y = coord[1] - coord_xy[1];
+                            double distance = Math.sqrt(del_x * del_x + del_y * del_y);
+
+                            if (min_distance == -1) {
+                                min_distance = distance;
+                                dst_dvm_id = entry_coord.getKey();
+                                this.ret_str_coord[3] = Integer.toString(coord[0]);
+                                this.ret_str_coord[4] = Integer.toString(coord[1]);
+                            } else if (min_distance > distance) {
+                                min_distance = distance;
+                                dst_dvm_id = entry_coord.getKey();
+                                this.ret_str_coord[3] = Integer.toString(coord[0]);
+                                this.ret_str_coord[4] = Integer.toString(coord[1]);
+                            }
+                        }
+                    }
+                }
+
+                if (min_distance == -1) {
+                    this.ret_str_coord[0] = "0";
+                } else {
+
+                    // 랜덤 코드 생성기! 가능한 문자열의 글자
+                    String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                    StringBuilder sb = new StringBuilder();
+                    // 랜덤 객체 생성
+                    Random random = new Random();
+                    // 주어진 길이만큼 반복하여 랜덤 문자열 생성
+                    for (int i = 0; i < 10; i++) {
+                        // characters 문자열에서 랜덤한 글자 선택하여 sb에 추가
+                        int randomIndex = random.nextInt(characters.length());
+                        sb.append(characters.charAt(randomIndex));
+                    }
+
+                    this.ret_str_coord[0] = sb.toString();
+                    this.ret_str_coord[1] = dst_dvm_id;
+                    this.ret_str_coord[2] = Double.toString(min_distance);
+                }
+                ///////////////////////////////////////
+
                 try {
                     writer.close();
                     reader.close();
@@ -297,7 +360,6 @@ public class DVMController {
                 } catch (Exception e) {
                     throw new RuntimeException("Error closing streams", e);
                 }
-//            return msg_content;
             } catch (Exception e) {
                 System.out.println("Client exception: " + e.getMessage());
                 e.printStackTrace();

@@ -526,8 +526,6 @@ public class DVMUI extends JFrame {
              */
             ret = dvmStock.check_stock(item_code, count);
             if (ret == 0) {
-                pay_UI(DEF);
-            } else if (ret == 1) {
                 /**
                  * request_stock_msg -> -1, 0, 1
                  */
@@ -541,6 +539,8 @@ public class DVMUI extends JFrame {
                 } else {
                     item_list_UI(NULLABLE);
                 }
+            } else if (ret == 1) {
+                pay_UI(DEF);
             } else if (ret == 2) {
                 item_list_UI(ERROR);
             }

@@ -92,8 +92,8 @@ public class DVMController {
                 .put("src_id", "Team6")
                 .put("dst_id", "0")
                 .put("msg_content", new JSONObject()
-                        .put("item_code", item_code)
-                        .put("item_num", count)
+                        .put("item_code", String.format("%02d", item_code))
+                        .put("item_num", Integer.toString(count))
                 );
 
         //broadcast일 경우 HOST, POST 바꾸거나 for 돌리기!
@@ -200,8 +200,8 @@ public class DVMController {
                                 .put("src_id", "Team6")
                                 .put("dst_id", "0")
                                 .put("msg_content", new JSONObject()
-                                        .put("item_code", Integer.parseInt(res_item_code))
-                                        .put("item_num", our_item_counts[Integer.parseInt(res_item_code) - 1])
+                                        .put("item_code", String.format("%02d", Integer.parseInt(res_item_code)))
+                                        .put("item_num", Integer.toString(our_item_counts[Integer.parseInt(res_item_code) - 1]))
                                         .put("coor_x", coord_xy[0])
                                         .put("coor_y", coord_xy[1])
                                 );
@@ -249,8 +249,8 @@ public class DVMController {
                 .put("src_id", "Team6")
                 .put("dst_id", other_dvm_msg.get("src_id"))
                 .put("msg_content", new JSONObject()
-                        .put("item_code", res_item_code)
-                        .put("item_num", our_item_counts[res_item_code - 1]) //[질문] 선결제 성공 했다면, 차감된 재고를 보내야 하는지, 차감되기 전 재고를 보내야 하는지?
+                        .put("item_code", String.format("%02d", res_item_code))
+                        .put("item_num", Integer.toString(our_item_counts[res_item_code - 1])) //[질문] 선결제 성공 했다면, 차감된 재고를 보내야 하는지, 차감되기 전 재고를 보내야 하는지?
                         .put("availability", possible_prepay ? "T" : "F")
                 );
 
@@ -277,9 +277,9 @@ public class DVMController {
                 writer.println(msg);
                 System.out.println("Client : send to server" + msg);
 
-                //String reader_log = reader.readLine();
+                String reader_log = reader.readLine();
                 //System.out.println("Cli : reader_log : " + reader_log);
-                JSONObject response_other_dvm = new JSONObject(reader.readLine());
+                JSONObject response_other_dvm = new JSONObject(reader_log);
                 System.out.println("Client : server res receive!!" + response_other_dvm);
 
                 //응답 받은 것을 저장
@@ -377,8 +377,8 @@ public class DVMController {
                     .put("src_id", "Team6")
                     .put("dst_id", dst_dvm_id)
                     .put("msg_content", new JSONObject()
-                            .put("item_code", item)
-                            .put("item_num", count)
+                            .put("item_code", String.format("%02d", item))
+                            .put("item_num", Integer.toString(count))
                             .put("cert_code", ret_str[0])
                     );
 

@@ -73,6 +73,8 @@ public class DVMController {
      * stock_msg_JSON 만들어서 브로드캐스팅으로 전송한다.
      */
     public boolean request_stock_msg(int item_code, int count) {
+        tmp_item = item_code;
+        tmp_count = count;
         stock_msg_JSON = new JSONObject()
                 .put("msg_type", "req_stock")
                 .put("src_id", "Team6")
@@ -132,8 +134,8 @@ public class DVMController {
     }
 
     private final int SERVER_PORT = 30303;  //우리 컴퓨터에 열릴 포트
-    private final int CLIENT_PORT = 42424;  //남의 컴퓨터로 보낼 포트
-    private final String HOST = "localhost";    //남의 컴퓨터 주소!
+    private final int CLIENT_PORT = 30303;  //남의 컴퓨터로 보낼 포트
+    private final String HOST = "turtle-hwan.iptime.org";    //남의 컴퓨터 주소!
     private final Gson gson = new Gson();
 
     /**
@@ -169,7 +171,7 @@ public class DVMController {
                         if (res_msg.getJSONObject("msg_content").get("availability").equals("T")) {
                             possible_prepay.set(true);
                             //System.out.println(other_dvm_msg.getJSONObject("msg_content").get("cert_code").toString());
-                            
+
                             //int 하나에 구겨넣기 : item 개수 * 100 + item code
                             int code = Integer.parseInt(other_dvm_msg.getJSONObject("msg_content").get("item_code").toString()) * 100 + Integer.parseInt(other_dvm_msg.getJSONObject("msg_content").get("item_code").toString());
                             this.code_stock.put(other_dvm_msg.getJSONObject("msg_content").get("cert_code").toString(), code);

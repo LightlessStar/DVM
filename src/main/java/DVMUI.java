@@ -516,8 +516,8 @@ public class DVMUI extends JFrame {
         this.tmp_item = item_code;
         this.tmp_count = count;
         /**
-         * return 0 : 재고 존재
-         * return 1 : 재고 부족, 다른 곳에 재고 존재
+         * return 0 : 재고 부족, 다른 곳에 재고 존재
+         * return 1 : 재고 존재
          * return -1 : 입력 값이 잘못되었을 때
          */
         ret = dvmStock.check_stock(item_code, count);

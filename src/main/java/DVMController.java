@@ -307,8 +307,10 @@ public class DVMController {
 
         boolean possible_prepay = false;
         if (our_item_counts[res_item_code - 1] >= res_item_num) {
-            dvmStock.check_stock(res_item_code, res_item_num);
-            possible_prepay = true;
+            int status = dvmStock.check_stock(res_item_code, res_item_num);
+            if(status == 1) {
+                possible_prepay = true;
+            }
         }
 
         JSONObject res_msg = new JSONObject();

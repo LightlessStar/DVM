@@ -177,9 +177,15 @@ public class DVMUI extends JFrame {
             }
         });
         //그 구현상에는 취소버튼이 없어...
-//    JButton button2 = new JButton("취소");
+        JButton button2 = new JButton("직접 구매");
+        button2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                item_list_UI(DEF);
+            }
+        });
         bottom.add(button1);
-//    bottom.add(button2);
+        bottom.add(button2);
 
         contentPane.add(top);
         contentPane.add(bottom);

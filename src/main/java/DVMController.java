@@ -58,7 +58,7 @@ public class DVMController {
         other_dvm.put("52.78.141.160", 9999);
         other_dvm.put("13.124.36.229", 9001);
         other_dvm.put("43.200.64.96", 8080);
-
+        other_dvm.put("192.168.64.178", 1234);
         other_dvm.put("13.124.7.236", 11120);
         other_dvm.put("43.203.97.72", 8080);
         other_dvm.put("http://ec2-3-147-70-35.us-east-2.compute.amazonaws.com", 8080);
@@ -215,8 +215,8 @@ public class DVMController {
     }
 
     private final int SERVER_PORT = 30303;  //우리 컴퓨터에 열릴 포트
-    private final int CLIENT_PORT = 30303;  //남의 컴퓨터로 보낼 포트
-    private final String HOST = "turtle-hwan.iptime.org";    //남의 컴퓨터 주소!
+    private final int CLIENT_PORT = 1234;  //남의 컴퓨터로 보낼 포트
+    private final String HOST = "192.168.64.178";    //남의 컴퓨터 주소!
     private final Gson gson = new Gson();
 
     /**
@@ -254,7 +254,7 @@ public class DVMController {
                             //System.out.println(other_dvm_msg.getJSONObject("msg_content").get("cert_code").toString());
 
                             //int 하나에 구겨넣기 : item 개수 * 100 + item code
-                            int code = Integer.parseInt(other_dvm_msg.getJSONObject("msg_content").get("item_code").toString()) * 100 + Integer.parseInt(other_dvm_msg.getJSONObject("msg_content").get("item_code").toString());
+                            int code = Integer.parseInt(other_dvm_msg.getJSONObject("msg_content").get("item_code").toString()) * 100 + Integer.parseInt(other_dvm_msg.getJSONObject("msg_content").get("item_num").toString());
                             this.code_stock.put(other_dvm_msg.getJSONObject("msg_content").get("cert_code").toString(), code);
                             //System.out.println("codestock : " + this.code_stock);
                         }

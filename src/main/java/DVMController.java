@@ -106,6 +106,7 @@ public class DVMController {
         for (Map.Entry<String, Integer> dvm : other_dvm.entrySet()) {
             req_stock_msg(stock_msg_JSON, dvm.getKey(), dvm.getValue());
         }
+
         System.out.println("thread 종료");
         ///////////////////////////////////////
         //item 보유 중이고, 가장 거리가 가까운 dvm id 선별
@@ -165,6 +166,7 @@ public class DVMController {
         System.out.println(ret_str_coord[0]);
         System.out.println(ret_str_coord[1]);
         System.out.println(ret_str_coord[2]);
+
         return this.ret_str_coord;
     }
 
@@ -353,8 +355,6 @@ public class DVMController {
                 coor[0] = Integer.parseInt(response_other_dvm.getJSONObject("msg_content").get("coor_x").toString());
                 coor[1] = Integer.parseInt(response_other_dvm.getJSONObject("msg_content").get("coor_y").toString());
                 other_dvm_coord.put(response_other_dvm.get("src_id").toString(), coor);
-
-
 
                 try {
                     writer.close();

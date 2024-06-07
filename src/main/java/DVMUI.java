@@ -35,7 +35,7 @@ public class DVMUI extends JFrame {
     private String[] str;
     private int tmp_item;
     private int tmp_count;
-    private String[] tmp_coord;
+    private static String[] tmp_coord;
 
     private static int find_string_index(String[] array, String target) {
         for (int i = 0; i < array.length; i++) {
@@ -529,7 +529,10 @@ public class DVMUI extends JFrame {
                  * request_stock_msg -> -1, 0, 1
                  */
                 this.tmp_coord = dvmController.request_stock_msg(tmp_item, tmp_count);
-                if (tmp_coord.equals(1) == true) {
+                System.out.println(this.tmp_coord[0]);
+                System.out.println(this.tmp_coord[1]);
+                System.out.println(this.tmp_coord[2]);
+                if (tmp_coord[0].equals("1") == true) {
                     prepay_UI(item_code);
                 } else {
 

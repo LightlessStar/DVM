@@ -18,7 +18,7 @@ public class DVMController {
     private final int[] coord_xy; //주어진 우리 DVM 좌표
     private HashMap<String, int[]> other_dvm_coord;
     private HashMap<String, Integer> other_dvm_stock;
-    private HashMap<String, Integer> other_dvm;
+    private static HashMap<String, Integer> other_dvm;
     private String verify_codes[];// 새로 추가된 인증코드용 배열
     //Socket 통신 관련 변수는 메서드 안에서만 쓴다면 DCD에서 제외해도 될 듯
     private ServerSocket socket;
@@ -277,6 +277,8 @@ public class DVMController {
                 writer.println(msg);
                 System.out.println("Client : send to server" + msg);
 
+                //String reader_log = reader.readLine();
+                //System.out.println("Cli : reader_log : " + reader_log);
                 JSONObject response_other_dvm = new JSONObject(reader.readLine());
                 System.out.println("Client : server res receive!!" + response_other_dvm);
 

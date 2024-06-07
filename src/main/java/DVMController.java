@@ -18,6 +18,7 @@ public class DVMController {
     private final int[] coord_xy; //주어진 우리 DVM 좌표
     private HashMap<String, int[]> other_dvm_coord;
     private HashMap<String, Integer> other_dvm_stock;
+    private HashMap<String, Integer> other_dvm;
     private String verify_codes[];// 새로 추가된 인증코드용 배열
     //Socket 통신 관련 변수는 메서드 안에서만 쓴다면 DCD에서 제외해도 될 듯
     private ServerSocket socket;
@@ -53,6 +54,17 @@ public class DVMController {
     }
 
     public DVMController(DVMStock dvmStock) {
+        other_dvm = new HashMap<>();
+        other_dvm.put("52.78.141.160", 9999);
+        other_dvm.put("13.124.36.229", 9001);
+        other_dvm.put("43.200.64.96", 8080);
+
+        other_dvm.put("13.124.7.236", 11120);
+        other_dvm.put("43.203.97.72", 8080);
+        other_dvm.put("http://ec2-3-147-70-35.us-east-2.compute.amazonaws.com", 8080);
+        other_dvm.put("15.164.4.234", 8888);
+
+
         price = new int[20];
         stock_msg_JSON = new JSONObject();
         prepayment_msg_JSON = new JSONObject();
@@ -85,7 +97,9 @@ public class DVMController {
                 );
 
         //broadcast일 경우 HOST, POST 바꾸거나 for 돌리기!
-        req_stock_msg(stock_msg_JSON, HOST, CLIENT_PORT);
+        for (Map.Entry<String, Integer> dvm : other_dvm.entrySet()) {
+            req_stock_msg(stock_msg_JSON, dvm.getKey(), dvm.getValue());
+        }
         return true;
     }
 

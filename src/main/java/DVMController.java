@@ -100,7 +100,7 @@ public class DVMController {
         for (Map.Entry<String, Integer> dvm : other_dvm.entrySet()) {
             req_stock_msg(stock_msg_JSON, dvm.getKey(), dvm.getValue());
         }
-        return ret_str_coord;
+        return this.ret_str_coord;
     }
 
     public int send_code(String verify_code) {
@@ -333,20 +333,20 @@ public class DVMController {
                 if (min_distance == -1) {
                     this.ret_str_coord[0] = "0";
                 } else {
-
+                    this.ret_str_coord[0] = "1";
                     // 랜덤 코드 생성기! 가능한 문자열의 글자
-                    String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-                    StringBuilder sb = new StringBuilder();
-                    // 랜덤 객체 생성
-                    Random random = new Random();
-                    // 주어진 길이만큼 반복하여 랜덤 문자열 생성
-                    for (int i = 0; i < 10; i++) {
-                        // characters 문자열에서 랜덤한 글자 선택하여 sb에 추가
-                        int randomIndex = random.nextInt(characters.length());
-                        sb.append(characters.charAt(randomIndex));
-                    }
+//                    String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+//                    StringBuilder sb = new StringBuilder();
+//                    // 랜덤 객체 생성
+//                    Random random = new Random();
+//                    // 주어진 길이만큼 반복하여 랜덤 문자열 생성
+//                    for (int i = 0; i < 10; i++) {
+//                        // characters 문자열에서 랜덤한 글자 선택하여 sb에 추가
+//                        int randomIndex = random.nextInt(characters.length());
+//                        sb.append(characters.charAt(randomIndex));
+//                    }
 
-                    this.ret_str_coord[0] = sb.toString();
+//                    this.ret_str_coord[0] = sb.toString();
                     this.ret_str_coord[1] = dst_dvm_id;
                     this.ret_str_coord[2] = Double.toString(min_distance);
                 }

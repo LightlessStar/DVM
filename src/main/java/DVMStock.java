@@ -32,14 +32,14 @@ public class DVMStock {
         try {
             if (!Is_our_item[item_code - 1] || item[item_code - 1] < count) {
                 //우리한테 없는 item || item 재고 없음
-                return 1;
+                return 0;
             } else if (count > 20 || count < 0) {
                 System.out.println("EXP: 구매 가능 개수 20개를 초과했거나 count가 올바르지 않습니다");
                 return -1;
             } else {
                 //우리가 가진 item, 재고 충분
                 item[item_code - 1] -= count;
-                return 0;
+                return 1;
             }
         } catch (Exception e) {
             System.out.println(e);

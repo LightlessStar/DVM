@@ -19,7 +19,7 @@ public class DVMUI extends JFrame {
             "보리차", "캔커피", "물", "에너지드링크",
             "유자차", "식혜", "아이스티", "딸기주스",
             "오렌지주스", "포도주스", "이온음료", "아메리카노",
-            "핫초코", "카페라뗴"
+            "핫초코", "카페라떼"
     };
     final private Integer[] price = {
             0, 2000, 2000, 1500,
@@ -515,35 +515,30 @@ public class DVMUI extends JFrame {
 //        charge = price[item_code] * count;
         this.tmp_item = item_code;
         this.tmp_count = count;
-        if (count < 1 || count > 20) {
-            this.item_list_UI(ERROR);
-        } else {
+        /**
+         * return 0 : 재고 부족, 다른 곳에 재고 존재
+         * return 1 : 재고 존재
+         * return -1 : 입력 값이 잘못되었을 때
+         */
+        ret = dvmStock.check_stock(item_code, count);
+        if (ret == 0) {
             /**
-             * return 0 : 재고 존재
-             * return 1 : 재고 부족, 다른 곳에 재고 존재
-             * return 2 : 다른 곳에 재고 부족일때
-             * return 3 : count > 20, count < 0
+             * request_stock_msg -> -1, 0, 1
              */
-            ret = dvmStock.check_stock(item_code, count);
-            if (ret == 0) {
-                pay_UI(DEF);
-            } else if (ret == 1) {
-                /**
-                 * request_stock_msg -> -1, 0, 1
-                 */
-                this.tmp_coord = dvmController.request_stock_msg(tmp_item, tmp_count);
+            this.tmp_coord = dvmController.request_stock_msg(tmp_item, tmp_count);
 
-                System.out.println(this.tmp_coord[0]);
-                System.out.println(this.tmp_coord[1]);
-                System.out.println(this.tmp_coord[2]);
-                if (tmp_coord[0].equals("1") == true) {
-                    prepay_UI(item_code);
-                } else {
-                    item_list_UI(NULLABLE);
-                }
-            } else if (ret == 2) {
-                item_list_UI(ERROR);
+            System.out.println(this.tmp_coord[0]);
+            System.out.println(this.tmp_coord[1]);
+            System.out.println(this.tmp_coord[2]);
+            if (tmp_coord[0].equals("1") == true) {
+                prepay_UI(item_code);
+            } else {
+                item_list_UI(NULLABLE);
             }
+        } else if (ret == 1) {
+            pay_UI(DEF);
+        } else if (ret == -1) {
+            this.item_list_UI(ERROR);
         }
     }
 

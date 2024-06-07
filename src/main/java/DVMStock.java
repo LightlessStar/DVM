@@ -7,19 +7,19 @@ public class DVMStock {
     public DVMStock() {
         item = new int[20];
         //item 개수 99개로 초기화
-//        for (int i = 0; i < item.length; i++) {
-//            item[i] = 99;
-//        }
+        for (int i = 0; i < item.length; i++) {
+            item[i] = 99;
+        }
 
         Is_our_item = new boolean[20];
         //우리가 관리하는 Item 정하기
-//        Is_our_item[0] = true;
-//        Is_our_item[1] = true;
-//        Is_our_item[2] = true;
-//        Is_our_item[3] = true;
-//        Is_our_item[4] = true;
-//        Is_our_item[5] = true;
-//        Is_our_item[6] = true;
+        Is_our_item[0] = true;
+        Is_our_item[1] = true;
+        Is_our_item[2] = true;
+        Is_our_item[3] = true;
+        Is_our_item[4] = true;
+        Is_our_item[5] = true;
+        Is_our_item[6] = true;
         //우리가 관리하지 않는 Item 0 초기화
         for (int i = 0; i < item.length; i++) {
             if (!Is_our_item[i]) {

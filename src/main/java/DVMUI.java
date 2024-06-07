@@ -1,3 +1,4 @@
+import org.json.JSONObject;
 import sun.security.x509.IPAddressName;
 
 import javax.swing.*;
@@ -34,6 +35,7 @@ public class DVMUI extends JFrame {
     private String[] str;
     private int tmp_item;
     private int tmp_count;
+    private String[] tmp_coord;
 
     private static int find_string_index(String[] array, String target) {
         for (int i = 0; i < array.length; i++) {
@@ -83,6 +85,8 @@ public class DVMUI extends JFrame {
         //4 * 5 짜리 jpanel을 만들어 jframe에 부착하는 작업.
         if (status == ERROR) {
             title.setText("결제에 실패했습니다. 다시 확인해주세요");
+        } else if (status == PREPAY) {
+            title.setText("좌표는 " + tmp_coord[1] + "입니다");
         }
         contentPane.add(title);
         JPanel panel = new JPanel();
@@ -177,9 +181,15 @@ public class DVMUI extends JFrame {
             }
         });
         //그 구현상에는 취소버튼이 없어...
-//    JButton button2 = new JButton("취소");
+        JButton button2 = new JButton("직접 구매");
+        button2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                item_list_UI(PREPAY);
+            }
+        });
         bottom.add(button1);
-//    bottom.add(button2);
+        bottom.add(button2);
 
         contentPane.add(top);
         contentPane.add(bottom);
@@ -515,8 +525,14 @@ public class DVMUI extends JFrame {
             if (ret == 0) {
                 pay_UI(DEF);
             } else if (ret == 1) {
-                if (dvmController.request_stock_msg(tmp_item, tmp_count)) {
+                /**
+                 * request_stock_msg -> -1, 0, 1
+                 */
+                this.tmp_coord = dvmController.request_stock_msg(tmp_item, tmp_count);
+                if (tmp_coord.equals(1) == true) {
                     prepay_UI(item_code);
+                } else {
+
                 }
             } else if (ret == 2) {
                 item_list_UI(ERROR);

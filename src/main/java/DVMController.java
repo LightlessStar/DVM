@@ -206,18 +206,9 @@ public class DVMController {
         return false;
     }
 
-    /**
-     * 선결제 완료된 후, 선결제코드, 팀명, x, y 좌표 보내주기
-     */
-    public String[] code_and_loc() {
-        String[] code_team_xy = new String[4];
-        return code_team_xy;
-    }
-
     private final int SERVER_PORT = 30303;  //우리 컴퓨터에 열릴 포트
     private final int CLIENT_PORT = 1234;  //남의 컴퓨터로 보낼 포트
     private final String HOST = "192.168.64.178";    //남의 컴퓨터 주소!
-    private final Gson gson = new Gson();
 
     /**
      * 우리 DVM 서버에서 지속적으로 Thread로 돌면서 stock_msg 통신 받아서 응답하는 함수

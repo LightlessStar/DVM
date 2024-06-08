@@ -21,9 +21,6 @@ public class DVMController {
     private static HashMap<String, Integer> other_dvm;
     private String verify_codes[];// 새로 추가된 인증코드용 배열
     //Socket 통신 관련 변수는 메서드 안에서만 쓴다면 DCD에서 제외해도 될 듯
-    private ServerSocket socket;
-    private InputStream in;
-    private OutputStream out;
 
     //DCD에 없는 것들
     private Bank bank; //이거 왜 없어ㅓㅓㅓㅓㅓDCD에 넣어야 해
@@ -80,9 +77,7 @@ public class DVMController {
         this.dvmStock = dvmStock;
     }
 
-    private static String s1;
-    private static String s2;
-    private static String s3;
+
 
     private static String[] ret_str_coord = new String[5];
 

@@ -1,6 +1,3 @@
-import org.json.JSONObject;
-import sun.security.x509.IPAddressName;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -29,6 +26,7 @@ public class DVMUI extends JFrame {
             3000, 2000, 2000, 1000,
             2500, 1000
     };
+
     private int status;
     final private JFrame frame;
     private DVMStock dvmStock;
@@ -57,12 +55,19 @@ public class DVMUI extends JFrame {
         frame.setVisible(true); // 화면에 프레임 출력
     }
 
+    /**
+     * 가장 처음 유저에게 보이는 화면.
+     *
+     * @param status : ERROR : 결제 실패
+     *               PREPAY : 선결제시 사용
+     *               NULLABLE : 선결제시 다른 dvm에도 재고가 없는 경우
+     */
     private void item_list_UI(int status) {
         Container contentPane = frame.getContentPane();
         JLabel title = new JLabel("DVM TEAM6");
         contentPane.setLayout(new GridLayout(4, 1));
         contentPane.removeAll();
-        //4 * 5 짜리 jpanel을 만들어 jframe에 부착하는 작업.
+
         if (status == ERROR) {
             title.setText("결제에 실패했습니다. 다시 확인해주세요");
         } else if (status == PREPAY) {
@@ -113,21 +118,19 @@ public class DVMUI extends JFrame {
         buttonPanel2.add(button);
         buttonPanel2.add(button2);
 
-        //패널 2개를 contentPane에 추가
         contentPane.add(buttonPanel1, BorderLayout.NORTH);
         contentPane.add(panel, BorderLayout.CENTER);
         contentPane.add(buttonPanel2, BorderLayout.SOUTH);
 
-        //새로운 contentPane으로 설정
         frame.setContentPane(contentPane);
-
-        //새 contentPane 재배치 및 다시 그리기
         frame.revalidate();
         frame.repaint();
     }
 
     /**
      * 1-b Select Item 1-e 선결제 파트가 실제로 진행되어야 함.
+     * 선결제를 진행할 경우 보이는 화면, 카드번호 입력받음
+     * 선결제 혹은 직접 가서 가져오기를 선택할 수 있음.
      *
      * @param status - 1 ~ 20 : drink status
      */
@@ -162,7 +165,7 @@ public class DVMUI extends JFrame {
                 insert_card(card_id);
             }
         });
-        //그 구현상에는 취소버튼이 없어...
+
         JButton button2 = new JButton("직접 구매");
         button2.addActionListener(new ActionListener() {
             @Override
@@ -172,10 +175,10 @@ public class DVMUI extends JFrame {
         });
         bottom.add(button1);
         bottom.add(button2);
-
         contentPane.add(top);
         contentPane.add(bottom);
-        //새로운 contentPane으로 설정
+
+        //frame에 새로 contentPane을 넣고, 다시 그리는 작업
         frame.setContentPane(contentPane);
         frame.revalidate();
         frame.repaint();
@@ -184,6 +187,8 @@ public class DVMUI extends JFrame {
     /**
      * 1-b Select Item
      * 1-d Insert Card
+     * 결제를 할 수 있을 때 볼 수 있는 화면.
+     * 잔고가 부족해 결제할 수 없을 때에도 이 함수가 사용됨.
      *
      * @param status PAY - normal pay condition ERROR - error
      */
@@ -231,13 +236,14 @@ public class DVMUI extends JFrame {
             contentPane.add(button, BorderLayout.SOUTH);
         }
 
-        //새로운 contentPane으로 설정
         frame.setContentPane(contentPane);
-        //새 contentPane 재배치 및 다시 그리기
         frame.revalidate();
         frame.repaint();
     }
 
+    /**
+     * 선결제를 한 코드를 입력해 음료수를 받을 수 있는 화면
+     */
     private void code_verify_UI(int status) {
         Container contentPane = getContentPane();
         contentPane.removeAll();
@@ -267,9 +273,9 @@ public class DVMUI extends JFrame {
     }
 
     /**
-     * pay ok after insert_card or After code input is ok
+     * 결제를 마치고 자판기에서 구매한 음료의 개수와 종류를 출력하는 화면
      *
-     * @param status - item code
+     * @param status - item_list_UI status
      */
     private void item_UI(int status) {
         Container contentPane = getContentPane();
@@ -296,20 +302,22 @@ public class DVMUI extends JFrame {
         contentPane.add(adminLabel, BorderLayout.NORTH);
         contentPane.add(bottom, BorderLayout.SOUTH);
 
-        //새로운 contentPane으로 설정
         frame.setContentPane(contentPane);
-
-        //새 contentPane 재배치 및 다시 그리기
         frame.revalidate();
         frame.repaint();
     }
 
+    /**
+     * 선결제시 카드가 옳아 선결제가 될 경우 볼 수 있는 화면
+     * 다른 dvm와의 거리, 좌표를 표시함.
+     *
+     * @param status
+     */
     private void complete_prepay_UI(int status) {
         /**
          * str
          * 선결제 가능하면 string[0] 코드 string[1] 팀명, x y string[2] 거리,
-         *
-         * string[3] : x좌표 / string[4] : y좌표  추가로 담아 보낼게여
+         * string[3] : x좌표 / string[4] : y좌표
          */
         String[] str = this.str;
 
@@ -336,25 +344,21 @@ public class DVMUI extends JFrame {
         contentPane.add(body4);
         contentPane.add(button);
 
-        //새로운 contentPane으로 설정
         frame.setContentPane(contentPane);
-
         frame.revalidate();
         frame.repaint();
     }
 
     /**
-     * 원래는 status만 존재, int[] 가 추가되어 item 재고가 들어가게 됨.
+     * Admin이 재고를 볼 수 있는 화면
      *
      * @param status
      */
     private void check_stock_UI(int status, int[] item) {
         Container contentPane = getContentPane();
-        //removeAll이 없어서 깨지는 현상이 있었음.
         contentPane.removeAll();
         contentPane.setLayout(new GridLayout(3, 1));
 
-        // "관리자메뉴" 라벨 추가
         if (status == DEF) {
             JLabel adminLabel = new JLabel("재고 확인", JLabel.CENTER);
             contentPane.add(adminLabel, BorderLayout.NORTH);
@@ -393,12 +397,17 @@ public class DVMUI extends JFrame {
         frame.repaint();
     }
 
+    /**
+     * Admin이 로그인하고 나서 처음 보는 화면
+     * 재고 확인, 보충을 할 수 있음.
+     *
+     * @param status
+     */
     private void admin_UI(int status) {
         Container contentPane = getContentPane();
         contentPane.removeAll();
         contentPane.setLayout(new BorderLayout());
 
-        // "관리자메뉴" 라벨 추가
         JLabel adminLabel = new JLabel("관리자메뉴");
         contentPane.add(adminLabel, BorderLayout.NORTH);
 
@@ -420,14 +429,15 @@ public class DVMUI extends JFrame {
         buttonPanel.add(button1);
         buttonPanel.add(button2);
         contentPane.add(buttonPanel, BorderLayout.SOUTH);
-        //새로운 contentPane으로 설정
-        frame.setContentPane(contentPane);
 
-        //새 contentPane 재배치 및 다시 그리기
+        frame.setContentPane(contentPane);
         frame.revalidate();
         frame.repaint();
     }
 
+    /**
+     * Admin이 재고를 추가할 때 표시되는 화면.
+     */
     private void add_stock_UI(int status, int[] item) {
         Container contentPane = getContentPane();
         contentPane.removeAll();
@@ -456,7 +466,6 @@ public class DVMUI extends JFrame {
 
                     String numberText = numberInput.getText();
 
-                    //TODO : 에러 처리, integer이 아닌 경우
                     add_item(find_string_index(drink, selectedChoice), Integer.parseInt(numberText));
                 }
             });
@@ -471,14 +480,15 @@ public class DVMUI extends JFrame {
             bottom.add(button2);
             contentPane.add(bottom, BorderLayout.SOUTH);
         }
-        //새로운 contentPane으로 설정
-        frame.setContentPane(contentPane);
 
-        //새 contentPane 재배치 및 다시 그리기
+        frame.setContentPane(contentPane);
         frame.revalidate();
         frame.repaint();
     }
 
+    /**
+     * 비즈니스 로직 부분
+     */
     /**
      * 1-b Select Item
      *
@@ -488,7 +498,6 @@ public class DVMUI extends JFrame {
     public void select_item(int item_code, int count) {
         int ret;
 
-//        charge = price[item_code] * count;
         this.tmp_item = item_code;
         this.tmp_count = count;
         /**
@@ -546,9 +555,6 @@ public class DVMUI extends JFrame {
             if (dvmController.send_card_num(card_id, charge)) {
                 item_UI(DEF);
             } else {
-                /**
-                 * 다른 카드 입력 받는 창.
-                 */
                 add_item(tmp_item, tmp_count);
                 pay_UI(ERROR);
             }

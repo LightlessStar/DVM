@@ -7,8 +7,8 @@ public class Card {
         cash = Cash;
     }
 
-    public boolean card_check(int Card_id) {
-        if (card_id == Card_id) {
+    public boolean card_check(int card_id) {
+        if (this.card_id == card_id) {
             return true;
         } else {
             return false;

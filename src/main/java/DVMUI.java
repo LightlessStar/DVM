@@ -47,29 +47,8 @@ public class DVMUI extends JFrame {
         return -1;
     }
 
-
-    public DVMUI(DVMStock dvmStock, DVMController dvmController) {
-        this.dvmStock = dvmStock;
-        this.dvmController = dvmController;
-        frame = new JFrame("DVM TEAM6");
-        frame.setSize(600, 300);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        item_list_UI(DEF);
-        frame.setVisible(true); // 화면에 프레임 출력
-    }
-
     public DVMUI(DVMStock dvmStock) {
         this.dvmStock = dvmStock;
-        this.dvmController = new DVMController();
-        frame = new JFrame("DVM TEAM6");
-        frame.setSize(600, 300);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        item_list_UI(DEF);
-        frame.setVisible(true); // 화면에 프레임 출력
-    }
-
-    public DVMUI() {
-        this.dvmStock = new DVMStock();
         this.dvmController = new DVMController();
         frame = new JFrame("DVM TEAM6");
         frame.setSize(600, 300);
@@ -498,13 +477,6 @@ public class DVMUI extends JFrame {
         //새 contentPane 재배치 및 다시 그리기
         frame.revalidate();
         frame.repaint();
-    }
-
-    /**
-     * 1-a View Item User Action
-     */
-    public void view_item_list() {
-        item_list_UI(1);
     }
 
     /**

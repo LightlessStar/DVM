@@ -21,9 +21,6 @@ public class DVMController {
     private static HashMap<String, Integer> other_dvm;
     private String verify_codes[];// 새로 추가된 인증코드용 배열
     //Socket 통신 관련 변수는 메서드 안에서만 쓴다면 DCD에서 제외해도 될 듯
-    private ServerSocket socket;
-    private InputStream in;
-    private OutputStream out;
 
     //DCD에 없는 것들
     private Bank bank; //이거 왜 없어ㅓㅓㅓㅓㅓDCD에 넣어야 해
@@ -80,9 +77,7 @@ public class DVMController {
         this.dvmStock = dvmStock;
     }
 
-    private static String s1;
-    private static String s2;
-    private static String s3;
+
 
     private static String[] ret_str_coord = new String[5];
 
@@ -206,18 +201,9 @@ public class DVMController {
         return false;
     }
 
-    /**
-     * 선결제 완료된 후, 선결제코드, 팀명, x, y 좌표 보내주기
-     */
-    public String[] code_and_loc() {
-        String[] code_team_xy = new String[4];
-        return code_team_xy;
-    }
-
     private final int SERVER_PORT = 30303;  //우리 컴퓨터에 열릴 포트
     private final int CLIENT_PORT = 1234;  //남의 컴퓨터로 보낼 포트
     private final String HOST = "192.168.64.178";    //남의 컴퓨터 주소!
-    private final Gson gson = new Gson();
 
     /**
      * 우리 DVM 서버에서 지속적으로 Thread로 돌면서 stock_msg 통신 받아서 응답하는 함수

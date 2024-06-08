@@ -47,29 +47,8 @@ public class DVMUI extends JFrame {
         return -1;
     }
 
-
-    public DVMUI(DVMStock dvmStock, DVMController dvmController) {
-        this.dvmStock = dvmStock;
-        this.dvmController = dvmController;
-        frame = new JFrame("DVM TEAM6");
-        frame.setSize(600, 300);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        item_list_UI(DEF);
-        frame.setVisible(true); // 화면에 프레임 출력
-    }
-
     public DVMUI(DVMStock dvmStock) {
         this.dvmStock = dvmStock;
-        this.dvmController = new DVMController();
-        frame = new JFrame("DVM TEAM6");
-        frame.setSize(600, 300);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        item_list_UI(DEF);
-        frame.setVisible(true); // 화면에 프레임 출력
-    }
-
-    public DVMUI() {
-        this.dvmStock = new DVMStock();
         this.dvmController = new DVMController();
         frame = new JFrame("DVM TEAM6");
         frame.setSize(600, 300);
@@ -376,9 +355,13 @@ public class DVMUI extends JFrame {
         contentPane.setLayout(new GridLayout(3, 1));
 
         // "관리자메뉴" 라벨 추가
-        JLabel adminLabel = new JLabel("재고 확인", JLabel.CENTER);
-        contentPane.add(adminLabel, BorderLayout.NORTH);
-
+        if (status == DEF) {
+            JLabel adminLabel = new JLabel("재고 확인", JLabel.CENTER);
+            contentPane.add(adminLabel, BorderLayout.NORTH);
+        } else {
+            JLabel adminLabel = new JLabel("재고가 추가되지 않았습니다. 다시해주세요.", JLabel.CENTER);
+            contentPane.add(adminLabel, BorderLayout.NORTH);
+        }
         JPanel stock = new JPanel();
         stock.setLayout(new GridLayout(4, 5));
         for (int i = 1; i <= 20; i++) {
@@ -497,13 +480,6 @@ public class DVMUI extends JFrame {
     }
 
     /**
-     * 1-a View Item User Action
-     */
-    public void view_item_list() {
-        item_list_UI(1);
-    }
-
-    /**
      * 1-b Select Item
      *
      * @param item_code : Drink Code, 1 ~ 20, Matching one by one
@@ -527,10 +503,7 @@ public class DVMUI extends JFrame {
              */
             this.tmp_coord = dvmController.request_stock_msg(tmp_item, tmp_count);
 
-            System.out.println(this.tmp_coord[0]);
-            System.out.println(this.tmp_coord[1]);
-            System.out.println(this.tmp_coord[2]);
-            if (tmp_coord[0].equals("1") == true) {
+            if (tmp_coord[0].equals("1")) {
                 prepay_UI(item_code);
             } else {
                 item_list_UI(NULLABLE);
@@ -582,9 +555,12 @@ public class DVMUI extends JFrame {
         } else if (status == PREPAY) {
             if (dvmController.send_card_num(card_id, charge)) {
                 this.str = dvmController.prepay_info(tmp_item, tmp_count);
-                if (str[0].equals("0") == true) {
-                    dvmController.cancel_prepay(card_id, charge);
-                    item_list_UI(ERROR);
+                if (str[0].equals("0")) {
+                    if (dvmController.cancel_prepay(card_id, charge) == true) {
+                        item_list_UI(ERROR);
+                    } else {
+                        System.exit(1);
+                    }
                 } else {
                     complete_prepay_UI(tmp_item);
                 }
@@ -628,12 +604,12 @@ public class DVMUI extends JFrame {
      */
     public void add_item(int item_code, int stock) {
         int[] item;
-        if (dvmStock.add_item(item_code, stock)) {
-            item = dvmStock.check_stock_all();
+        boolean add_bool = dvmStock.add_item(item_code, stock);
+        item = dvmStock.check_stock_all();
+        if (add_bool) {
             check_stock_UI(DEF, item);
         } else {
-            item = dvmStock.check_stock_all();
-            check_stock_UI(DEF, item);
+            check_stock_UI(ERROR, item);
         }
     }
 }

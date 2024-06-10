@@ -1,10 +1,15 @@
-# 2024년 1학기 객체지향개발방법론 프로젝트
+# 2024년 1학기 객체지향개발방법론 프로젝트 : DVM
 
-<img src="https://img.shields.io/badge/java-007396?style=flat-square&logo=java&logoColor=white"/>   <img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white"/>   <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=Docker&logoColor=white"/>
+![Java](https://img.shields.io/badge/java-007396?style=flat-square&logo=java&logoColor=white&style=flat)
+![IntelliJ IDEA Badge](https://img.shields.io/badge/IntelliJ%20IDEA-000?logo=intellijidea&logoColor=fff&style=flat)
+![Jenkins Badge](https://img.shields.io/badge/Jenkins-D24939?logo=jenkins&logoColor=fff&style=flat)
+![Docker Badge](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=fff&style=flat)
+![GitHub Badge](https://img.shields.io/badge/GitHub-181717?logo=github&logoColor=fff&style=flat)
+![JUnit5 Badge](https://img.shields.io/badge/JUnit5-25A162?logo=junit5&logoColor=fff&style=flat)
 
-----
+---
 
-### Distributed Vending Machine
+## Distributed Vending Machine
 
 - OOAD(Object Oriented Analysis Design), UP 개발방법론을 적용하여 개발 진행
 - 각 팀마다 Distributed 자판기를 만들고, 합쳤을 때 전체 시스템이 분산되어 Serverless 한 것처럼 동작하는 것이 목표
